@@ -1,0 +1,21 @@
+[package]
+name = "rusty-tax-break"
+version = "0.1.0"
+authors = ["Arkadiusz Piekarz <piekarzarkadiusz@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+chrono = { version = "0.4.19", default-features = false, features = ["clock"] }
+gdk = { version = "0.13.2", default-features = false }
+git2 = { version = "0.13.14", default-features = false }
+glib = { version = "0.10.3", default-features = false }
+gtk = { version = "0.9.2", default-features = false, features = ["v3_20"] }
+num-traits = { version = "0.2.14", default-features = false }
+pango = { version = "0.9.1", default-features = false }
+to_trait = { version = "0.1.1", default-features = false }
+zip = { version = "0.5.9", default-features = false, features = ["deflate"] }
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+incremental = false
