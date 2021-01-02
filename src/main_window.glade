@@ -56,6 +56,7 @@
             </child>
             <child>
               <object class="GtkLabel" id="repositoryPathLabel">
+                <property name="name">repositoryPathLabel</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
@@ -71,6 +72,7 @@
             <child>
               <object class="GtkButton" id="chooseRepositoryFolderButton">
                 <property name="label" translatable="yes">Choose...</property>
+                <property name="name">chooseRepositoryFolderButton</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -264,6 +266,7 @@
                 <property name="shadow-type">in</property>
                 <child>
                   <object class="GtkTreeView" id="commitLogView">
+                    <property name="name">commitLogView</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="model">commitLogStoreFilter</property>

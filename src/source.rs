@@ -3,8 +3,10 @@ pub enum Source
 {
     ChooseOutputFolderButton,
     ChooseOutputFolderButtonWidget,
+    ChooseOutputFolderDialog,
     ChooseRepositoryFolderButton,
     ChooseRepositoryFolderButtonWidget,
+    ChooseRepositoryFolderDialog,
     CommitDiffViewWidget,
     CommitAuthorFilterEntry,
     CommitLog,

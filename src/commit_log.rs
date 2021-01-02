@@ -54,6 +54,11 @@ impl CommitLog
     fn onRepositoryChanged(&mut self, repo: &Rc<Repository>)
     {
         self.commits.clear();
+        if repo.isEmpty() {
+            eprintln!("Cannot load commits, because repository is empty.");
+            return;
+        }
+
         repo.iterateCommits(|commit| {
             let message = getFirstLineOfMessage(&commit);
             let signature = commit.author();

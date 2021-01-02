@@ -37,8 +37,10 @@ pub fn setupDispatching(handlers: EventHandlers, receiver: Receiver)
     attach(receiver, move |(source, event)| { match (source, &event) {
         (S::ChooseOutputFolderButtonWidget,     E::Clicked)                       => chooseOutputFolderButton.handle(source, &event),
         (S::ChooseOutputFolderButton,           E::FolderChosen(_))               => outputPathStore.handle(source, &event),
+        (S::ChooseOutputFolderDialog,           E::DialogResponded(_))            => chooseOutputFolderButton.handle(source, &event),
         (S::ChooseRepositoryFolderButton,       E::FolderChosen(_))               => repositoryStore.handle(source, &event),
         (S::ChooseRepositoryFolderButtonWidget, E::Clicked)                       => chooseRepositoryFolderButton.handle(source, &event),
+        (S::ChooseRepositoryFolderDialog,       E::DialogResponded(_))            => chooseRepositoryFolderButton.handle(source, &event),
         (S::CommitDiffViewWidget,               E::ZoomRequested(_))              => commitDiffView.handle(source, &event),
         (S::CommitAuthorFilterEntry,            E::CommitAuthorFilterChanged(_))  => commitLogModelFilter.handle(source, &event),
         (S::CommitLog,                          E::CommitLogFilled)               => commitLogModel.handle(source, &event),

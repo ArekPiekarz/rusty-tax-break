@@ -73,9 +73,13 @@ impl Gui
         Self{applicationWindow}
     }
 
-    pub fn run(&self)
+    pub fn show(&self)
     {
         self.applicationWindow.show();
+    }
+
+    pub fn run(&self)
+    {
         gtk::main();
     }
 }

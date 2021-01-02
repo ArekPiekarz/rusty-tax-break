@@ -23,6 +23,11 @@ impl Repository
         &self.path
     }
 
+    pub fn isEmpty(&self) -> bool
+    {
+        self.repo.is_empty().unwrap()
+    }
+
     pub fn iterateCommits(&self, mut handler: impl FnMut(&git2::Commit))
     {
         let mut revwalk = self.repo.revwalk().unwrap();
@@ -79,6 +84,6 @@ impl Debug for Repository
 {
     fn fmt(&self, formatter: &mut Formatter) -> FmtResult
     {
-        write!(formatter, "Repository{{path: {:?}}}", self.repo.path())
+        write!(formatter, "Repository {{ path: {:?} }}", self.repo.path())
     }
 }

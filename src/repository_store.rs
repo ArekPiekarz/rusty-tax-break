@@ -1,4 +1,4 @@
-use crate::event::{Event, FolderUriStr};
+use crate::event::Event;
 use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::repository::Repository;
 use crate::source::Source;
@@ -34,20 +34,7 @@ impl RepositoryStore
 
     // private
 
-    fn handleFolderChosen(&mut self, folderUri: &FolderUriStr)
-    {
-        match glib::filename_from_uri(folderUri) {
-            Ok((path, hostnameOpt)) => {
-                match hostnameOpt {
-                    Some(hostname) => eprintln!("Hostnames are not supported when choosing repositories: {}", hostname),
-                    None => self.setRepositoryPath(&path)
-                }
-            },
-            Err(e) => eprintln!("Getting path from folder URI failed: {}", e)
-        }
-    }
-
-    fn setRepositoryPath(&mut self, path: &Path)
+    fn handleFolderChosen(&mut self, path: &Path)
     {
         if let Some(repo) = &self.repo {
             if repo.getPath() == path {

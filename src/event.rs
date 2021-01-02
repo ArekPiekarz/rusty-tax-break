@@ -12,7 +12,8 @@ pub enum Event
     CommitLogFilled,
     CommitSelected(git2::Oid),
     CommitUnselected,
-    FolderChosen(FolderUri),
+    DialogResponded(gtk::ResponseType),
+    FolderChosen(PathBuf),
     GenerateReportRequested,
     MarkCommitForReportToggled(gtk::TreePath),
     MonthFilterChanged(chrono::Month),
@@ -26,6 +27,4 @@ pub enum Event
 
 pub type CommitAuthorFilter = String;
 pub type CommitAuthorFilterStr = str;
-pub type FolderUri = String;
-pub type FolderUriStr = str;
 pub type Year = i32;

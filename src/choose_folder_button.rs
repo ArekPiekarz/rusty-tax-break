@@ -4,8 +4,10 @@ use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
 use gtk::ButtonExt as _;
+use gtk::DialogExt as _;
 use gtk::FileChooserExt as _;
-use gtk::NativeDialogExt as _;
+use gtk::GtkWindowExt as _;
+use gtk::WidgetExt as _;
 
 
 pub struct ChooseFolderButton
@@ -13,7 +15,9 @@ pub struct ChooseFolderButton
     dialogTitle: &'static str,
     parentWindow: gtk::ApplicationWindow,
     source: Source,
-    sender: Sender
+    dialogSource: Source,
+    sender: Sender,
+    dialog: Option<gtk::FileChooserDialog>
 }
 
 impl EventHandler for ChooseFolderButton
@@ -22,6 +26,7 @@ impl EventHandler for ChooseFolderButton
     {
         match event {
             Event::Clicked => self.onClicked(),
+            Event::DialogResponded(response) => self.onDialogResponded(*response),
             _ => onUnknown(source, event)
         }
     }
@@ -34,6 +39,7 @@ impl ChooseFolderButton
         dialogTitle: &'static str,
         source: Source,
         widgetSource: Source,
+        dialogSource: Source,
         guiElementProvider: &GuiElementProvider,
         sender: Sender)
         -> Self
@@ -44,32 +50,81 @@ impl ChooseFolderButton
             parentWindow: guiElementProvider.get::<gtk::ApplicationWindow>("mainWindow"),
             dialogTitle,
             source,
-            sender
+            dialogSource,
+            sender,
+            dialog: None
         }
     }
 
 
     // private
 
-    fn onClicked(&self)
+    fn onClicked(&mut self)
     {
-        let dialog = gtk::FileChooserNative::new(
+        let dialog = gtk::FileChooserDialog::with_buttons(
             Some(self.dialogTitle),
             Some(&self.parentWindow),
             gtk::FileChooserAction::SelectFolder,
-            Some("Choose"),
-            Some("Cancel")
+            &[("Cancel", gtk::ResponseType::Cancel), ("Choose", gtk::ResponseType::Accept)]
         );
+        let sender = self.sender.clone();
+        let source = self.dialogSource;
+        dialog.connect_response(move |_dialog, response| {
+            sender.send((source, Event::DialogResponded(response))).unwrap();
+        });
+        dialog.set_modal(true);
+        dialog.show();
+        self.dialog = Some(dialog);
+    }
 
-        if dialog.run() == gtk::ResponseType::Accept {
-            self.handleSelectedFolder(dialog.get_uri());
+    fn onDialogResponded(&mut self, response: gtk::ResponseType)
+    {
+        match response {
+            gtk::ResponseType::Accept      => self.onDialogAccepted(),
+            gtk::ResponseType::Cancel      => self.onDialogCancelled(),
+            gtk::ResponseType::DeleteEvent => self.onDialogDeleted(),
+            _ => self.onUnknownDialogResponse(response)
         }
     }
 
-    fn handleSelectedFolder(&self, folderUriOpt: Option<glib::GString>)
+    fn onDialogAccepted(&mut self)
     {
-        if let Some(folderUri) = folderUriOpt {
-            self.sender.send((self.source, Event::FolderChosen(folderUri.into()))).unwrap();
+        let dialog = match &self.dialog {
+            None => {
+                eprintln!("Expected dialog to exist, but it didn't");
+                return;
+            },
+            Some(dialog) => dialog
+        };
+
+        if let Some(folder) = dialog.get_filename() {
+            self.sender.send((self.source, Event::FolderChosen(folder))).unwrap();
+        }
+        dialog.close();
+    }
+
+    fn onDialogCancelled(&mut self)
+    {
+        match &self.dialog {
+            Some(dialog) => {
+                dialog.close();
+                self.dialog = None;
+            },
+            None => eprintln!("Expected dialog to exist, but it didn't")
+        }
+    }
+
+    fn onDialogDeleted(&mut self)
+    {
+        self.dialog = None;
+    }
+
+    fn onUnknownDialogResponse(&mut self, response: gtk::ResponseType)
+    {
+        eprintln!("Received unknown dialog response: {:?}", response);
+        if let Some(dialog) = &self.dialog {
+            dialog.close();
+            self.dialog = None;
         }
     }
 }

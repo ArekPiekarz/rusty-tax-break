@@ -1,9 +1,10 @@
 use crate::date_time::LocalDate;
-use crate::event::{Event, FolderUriStr, Year};
+use crate::event::{Event, Year};
 use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::source::Source;
 
 use chrono::Datelike as _;
+use std::path::Path;
 use std::path::PathBuf;
 
 
@@ -20,7 +21,7 @@ impl EventHandler for OutputPathStore
     fn handle(&mut self, source: Source, event: &Event)
     {
         match event {
-            Event::FolderChosen(folderUri)   => self.onFolderChosen(folderUri),
+            Event::FolderChosen(path)        => self.onFolderChosen(path),
             Event::MonthFilterChanged(month) => self.onMonthChanged(*month),
             Event::YearFilterChanged(year)   => self.onYearChanged(*year),
             _ => onUnknown(source, event)
@@ -38,20 +39,7 @@ impl OutputPathStore
 
     // private
 
-    fn onFolderChosen(&mut self, folderUri: &FolderUriStr)
-    {
-        match glib::filename_from_uri(folderUri) {
-            Ok((path, hostnameOpt)) => {
-                match hostnameOpt {
-                    Some(hostname) => eprintln!("Hostnames are not supported when choosing outputs: {}", hostname),
-                    None => self.onValidFolderChosen(path)
-                }
-            },
-            Err(e) => eprintln!("Getting path from folder URI failed: {}", e)
-        }
-    }
-
-    fn onValidFolderChosen(&mut self, newPathPrefix: PathBuf)
+    fn onFolderChosen(&mut self, newPathPrefix: &Path)
     {
         if let Some(pathPrefix) = &self.pathPrefix {
             if *pathPrefix == newPathPrefix {
@@ -59,7 +47,7 @@ impl OutputPathStore
             }
         }
 
-        self.pathPrefix = Some(newPathPrefix);
+        self.pathPrefix = Some(newPathPrefix.into());
         self.updatePath();
     }
 

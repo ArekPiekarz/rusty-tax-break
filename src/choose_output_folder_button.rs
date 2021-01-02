@@ -10,6 +10,7 @@ pub fn makeChooseOutputFolderButton(guiElementProvider: &GuiElementProvider, sen
         "Choose output folder",
         Source::ChooseOutputFolderButton,
         Source::ChooseOutputFolderButtonWidget,
+        Source::ChooseOutputFolderDialog,
         guiElementProvider,
         sender
     )

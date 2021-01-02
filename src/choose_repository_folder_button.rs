@@ -10,6 +10,7 @@ pub fn makeChooseRepositoryFolderButton(guiElementProvider: &GuiElementProvider,
         "Choose repository folder",
         Source::ChooseRepositoryFolderButton,
         Source::ChooseRepositoryFolderButtonWidget,
+        Source::ChooseRepositoryFolderDialog,
         guiElementProvider,
         sender
     )
