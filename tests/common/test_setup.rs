@@ -1,3 +1,4 @@
+use crate::common::date_time::LocalDate;
 use crate::common::test_gui::TestGui;
 
 use rusty_tax_break::gui::Gui;
@@ -16,10 +17,26 @@ pub const COMMIT_EMAIL: &str = "john.smith@example.com";
 pub fn setupTest() -> (TempDir, PathBuf)
 {
     setupPanicHandler();
-    let repoDirGuard = makeTemporaryDirectory();
-    let repoDirPath = repoDirGuard.path().to_owned();
+    let (repoDirGuard, repoDirPath) = makeTemporaryDir();
     initializeGitRepository(&repoDirPath);
     (repoDirGuard, repoDirPath)
+}
+
+pub fn setupTestWithoutRepo()
+{
+    setupPanicHandler();
+}
+
+pub fn makeTemporaryDir() -> (TempDir, PathBuf)
+{
+    let tempDir = tempdir().unwrap_or_else(|e| panic!("Failed to create temporary directory: {}", e));
+    let path = tempDir.path().into();
+    (tempDir, path)
+}
+
+pub fn getCurrentDate() -> LocalDate
+{
+    chrono::Local::today()
 }
 
 pub fn makeGui() -> TestGui
@@ -35,11 +52,6 @@ pub fn makeGui() -> TestGui
 fn setupPanicHandler()
 {
     BacktracePrinter::default().install(Box::new(StandardStream::stderr(ColorChoice::Always)));
-}
-
-fn makeTemporaryDirectory() -> TempDir
-{
-    tempdir().unwrap_or_else(|e| panic!("Failed to create temporary directory: {}", e))
 }
 
 fn initializeGitRepository(repoDir: &Path)

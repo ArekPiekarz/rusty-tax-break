@@ -18,6 +18,16 @@ pub fn findCommitLogView(gui: &TestGui) -> gtk::TreeView
     gui.findWidget::<gtk::TreeView>("commitLogView")
 }
 
+pub fn findChooseOutputFolderButton(gui: &TestGui) -> gtk::Button
+{
+    gui.findWidget::<gtk::Button>("chooseOutputFolderButton")
+}
+
+pub fn findOutputPathLabel(gui: &TestGui) -> gtk::Label
+{
+    gui.findWidget::<gtk::Label>("outputPathLabel")
+}
+
 pub fn findFileChooserDialog() -> gtk::FileChooserDialog
 {
     let mut topLevelWindows = gtk::Window::list_toplevels();

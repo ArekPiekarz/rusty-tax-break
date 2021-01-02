@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.1 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkSizeGroup"/>
@@ -89,6 +89,7 @@
             <child>
               <object class="GtkButton" id="chooseOutputFolderButton">
                 <property name="label" translatable="yes">Choose...</property>
+                <property name="name">chooseOutputFolderButton</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -102,6 +103,7 @@
             </child>
             <child>
               <object class="GtkLabel" id="outputPathLabel">
+                <property name="name">outputPathLabel</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">none</property>

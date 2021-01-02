@@ -1,17 +1,25 @@
-use crate::common::gui_access::{findCommitLogView, findRepositoryPathLabel};
+use crate::common::date_time::LocalDate;
+use crate::common::gui_access::{findCommitLogView, findOutputPathLabel, findRepositoryPathLabel};
 use crate::common::test_gui::TestGui;
 
+use chrono::Datelike as _;
 use gtk::LabelExt as _;
 use gtk::TreeModelExt as _;
 use gtk::TreeViewExt as _;
+use std::path::Path;
 
 const CONTINUE_ITERATING_MODEL: bool = false;
 
 
-pub fn assertRepositoryPathLabelTextIs(text: &str, gui: &TestGui)
+pub fn assertRepositoryPathLabelTextIs(expectedText: &str, gui: &TestGui)
 {
     let label = findRepositoryPathLabel(gui);
-    assert_eq!(label.get_text().as_str(), text, "\nActual repository path label text differs from expected");
+    assert_eq!(label.get_text().as_str(), expectedText, "\nActual repository path label text differs from expected");
+}
+
+pub fn assertRepositoryPathLabelTextIsPlaceholder(gui: &TestGui)
+{
+    assertRepositoryPathLabelTextIs("none", gui);
 }
 
 pub fn assertCommitLogViewContentIs(expected: &[CommitLogRow], gui: &TestGui)
@@ -48,6 +56,21 @@ pub struct CommitLogRow
     email: String
 }
 
+pub fn assertOutputPathLabelTextIs(expectedText: &str, gui: &TestGui)
+{
+    let label = findOutputPathLabel(gui);
+    assert_eq!(label.get_text().as_str(), expectedText, "\nActual output path label text differs from expected");
+}
+
+pub fn assertOutputPathLabelTextIsPlaceholder(date: &LocalDate, gui: &TestGui)
+{
+    assertOutputPathLabelTextIs(&makePlaceholderOutputPathLabelText(date), &gui);
+}
+
+pub fn makeOutputPathLabelText(outputPathPrefix: &Path, date: &LocalDate) -> String
+{
+    format!("{}/{}/{:02}", outputPathPrefix.to_string_lossy(), date.year(), date.month())
+}
 
 // private
 
@@ -118,4 +141,9 @@ impl From<CommitLogColumn> for i32
     {
         value as Self
     }
+}
+
+fn makePlaceholderOutputPathLabelText(date: &LocalDate) -> String
+{
+    format!("<path>/{}/{:02}", date.year(), date.month())
 }

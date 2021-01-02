@@ -31,7 +31,7 @@ impl OutputPathLabel
     pub fn new(date: LocalDate, guiElementProvider: &GuiElementProvider) -> Self
     {
         let widget = guiElementProvider.get::<gtk::Label>("outputPathLabel");
-        widget.set_text(&format!("<path>/{}/{:02}/", date.year(), date.month()));
+        widget.set_text(&format!("<path>/{}/{:02}", date.year(), date.month()));
         Self{widget}
     }
 

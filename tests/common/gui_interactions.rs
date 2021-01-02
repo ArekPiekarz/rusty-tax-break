@@ -1,5 +1,5 @@
 use crate::common::event_processing::processEvents;
-use crate::common::gui_access::findChooseRepositoryFolderButton;
+use crate::common::gui_access::{findChooseOutputFolderButton, findChooseRepositoryFolderButton};
 use crate::common::test_gui::TestGui;
 
 use gtk::ButtonExt as _;
@@ -12,6 +12,11 @@ use std::path::Path;
 pub fn clickChooseRepositoryFolderButton(gui: &TestGui)
 {
     clickButton(&findChooseRepositoryFolderButton(gui));
+}
+
+pub fn clickChooseOutputFolderButton(gui: &TestGui)
+{
+    clickButton(&findChooseOutputFolderButton(gui));
 }
 
 pub fn setCurrentFolderInDialog(path: &Path, dialog: &gtk::FileChooserDialog)
@@ -29,6 +34,18 @@ pub fn setCurrentFolderInDialog(path: &Path, dialog: &gtk::FileChooserDialog)
 pub fn acceptDialog(dialog: &gtk::FileChooserDialog)
 {
     dialog.response(gtk::ResponseType::Accept);
+    processEvents();
+}
+
+pub fn cancelDialog(dialog: &gtk::FileChooserDialog)
+{
+    dialog.response(gtk::ResponseType::Cancel);
+    processEvents();
+}
+
+pub fn closeDialog(dialog: &gtk::FileChooserDialog)
+{
+    dialog.response(gtk::ResponseType::DeleteEvent);
     processEvents();
 }
 
