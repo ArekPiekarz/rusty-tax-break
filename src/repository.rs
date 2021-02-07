@@ -25,7 +25,18 @@ impl Repository
 
     pub fn isEmpty(&self) -> bool
     {
-        self.repo.is_empty().unwrap()
+        // git2::Repository::is_empty() incorrectly returns false for non-master initial branch,
+        // so in that case additionally check if we can find HEAD.
+        // See this bug report: https://github.com/rust-lang/git2-rs/issues/668
+
+        match self.repo.is_empty().unwrap() {
+            true => true,
+            false => match self.repo.head() {
+                Ok(_) => false,
+                Err(e) if e.class() == git2::ErrorClass::Reference && e.code() == git2::ErrorCode::UnbornBranch => true,
+                Err(e) => panic!("{}", e)
+            }
+        }
     }
 
     pub fn iterateCommits(&self, mut handler: impl FnMut(&git2::Commit))

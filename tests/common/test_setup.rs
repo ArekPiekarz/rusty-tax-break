@@ -56,7 +56,7 @@ fn setupPanicHandler()
 
 fn initializeGitRepository(repoDir: &Path)
 {
-    initializeGitRepositoryWith(&["git", "init"], repoDir);
+    initializeGitRepositoryWith(&["git", "init", "--initial-branch", "main"], repoDir);
     initializeGitRepositoryWith(&["git", "config", "user.name", COMMIT_AUTHOR], repoDir);
     initializeGitRepositoryWith(&["git", "config", "user.email", COMMIT_EMAIL], repoDir);
 }
