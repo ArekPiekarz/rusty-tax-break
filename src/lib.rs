@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-#[allow(clippy::new_without_default)]
+#![allow(clippy::new_without_default)]
 
 pub mod gui;
 
@@ -26,6 +26,8 @@ mod generate_report_button;
 mod gui_element_provider;
 mod line_number;
 mod month_filter_combo_box;
+mod open_options_button;
+mod options_dialog;
 mod output_path_label;
 mod output_path_store;
 mod report_generator;

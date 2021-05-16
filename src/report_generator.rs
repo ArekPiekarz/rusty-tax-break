@@ -22,7 +22,8 @@ pub struct ReportGenerator
 {
     commitLog: Rc<RefCell<CommitLog>>,
     repo: Option<Rc<Repository>>,
-    outputPath: Option<PathBuf>
+    outputPath: Option<PathBuf>,
+    outputFileNamesPattern: String
 }
 
 impl EventHandler for ReportGenerator
@@ -30,9 +31,10 @@ impl EventHandler for ReportGenerator
     fn handle(&mut self, source: Source, event: &Event)
     {
         match event {
-            Event::GenerateReportRequested => self.generateReport(),
-            Event::OutputPathChanged(path) => self.onOutputPathChanged(path),
-            Event::RepositoryChanged(repo) => self.onRepositoryChanged(repo),
+            Event::GenerateReportRequested                => self.generateReport(),
+            Event::OutputFileNamesPatternChanged(pattern) => self.onOutputFileNamesPatternChanged(pattern),
+            Event::OutputPathChanged(path)                => self.onOutputPathChanged(path),
+            Event::RepositoryChanged(repo)                => self.onRepositoryChanged(repo),
             _ => onUnknown(source, event)
         }
     }
@@ -40,13 +42,18 @@ impl EventHandler for ReportGenerator
 
 impl ReportGenerator
 {
-    pub fn new(commitLog: Rc<RefCell<CommitLog>>) -> Self
+    pub fn new(commitLog: Rc<RefCell<CommitLog>>, outputFileNamesPattern: &str) -> Self
     {
-        Self{commitLog, repo: None, outputPath: None}
+        Self{commitLog, repo: None, outputPath: None, outputFileNamesPattern: outputFileNamesPattern.into()}
     }
 
 
     // private
+
+    fn onOutputFileNamesPatternChanged(&mut self, pattern: &str)
+    {
+        self.outputFileNamesPattern = pattern.into();
+    }
 
     fn onOutputPathChanged(&mut self, path: &Path)
     {
@@ -71,7 +78,7 @@ impl ReportGenerator
             if !commitInfo.markedForReport {
                 continue;
             }
-            reportCommit(commitInfo, repo, outputPath);
+            self.reportCommit(commitInfo, repo, outputPath);
         }
     }
 
@@ -79,43 +86,66 @@ impl ReportGenerator
     {
         self.repo = Some(Rc::clone(repo));
     }
+
+    fn reportCommit(&self, commitInfo: &CommitInfo, repo: &Repository, outputPath: &Path)
+    {
+        let commitId = commitInfo.id;
+        let commit = repo.findCommit(commitId).unwrap();
+        let commitsDiff = repo.makeDiffOfCommitAndParent(&commit);
+
+        let zipFileNameStem = self.formatFileName(commitInfo, repo);
+        let fullFilesZipPath = makeFullFilesZipPath(outputPath, &zipFileNameStem);
+        let fullFilesZipFile = OpenOptions::new().write(true).create_new(true).open(&fullFilesZipPath).unwrap();
+        let mut fullFilesZipWriter = ZipWriter::new(fullFilesZipFile);
+
+        let diffAndFullFilesZipPath = makeDiffAndFullFilesZipPath(outputPath, &zipFileNameStem);
+        let diffAndFullFilesZipFile = OpenOptions::new().write(true).create_new(true).open(diffAndFullFilesZipPath).unwrap();
+        let mut diffAndFullFilesZipWriter = ZipWriter::new(diffAndFullFilesZipFile);
+
+        let zipOptions = ZipFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+
+        reportDiffFile(&commit, &commitsDiff, &mut diffAndFullFilesZipWriter, &zipOptions);
+        reportFullFiles(&commitsDiff, repo, &mut fullFilesZipWriter, &mut diffAndFullFilesZipWriter, &zipOptions);
+
+        fullFilesZipWriter.finish().unwrap();
+        diffAndFullFilesZipWriter.finish().unwrap();
+    }
+
+    fn formatFileName(&self, commitInfo: &CommitInfo, repo: &Repository) -> String
+    {
+        let mut fileName = self.outputFileNamesPattern.clone();
+        if fileName.contains("<commit_id>") {
+            fileName = fileName.replace("<commit_id>", &commitInfo.id.to_string());
+        }
+        if fileName.contains("<commit_short_id>") {
+            fileName = fileName.replace("<commit_short_id>", &makeCommitShortId(commitInfo.id, repo));
+        }
+        if fileName.contains("<commit_summary>") {
+            fileName = fileName.replace("<commit_summary>", &commitInfo.summary);
+        }
+        let sanitizingOptions = sanitize_filename::Options{windows: true, truncate: true, replacement: "_"};
+        let fileName = sanitize_filename::sanitize_with_options(fileName, sanitizingOptions);
+        fileName
+    }
 }
 
-fn reportCommit(commitInfo: &CommitInfo, repo: &Repository, outputPath: &Path)
+fn makeCommitShortId(commitId: git2::Oid, repo: &Repository) -> String
 {
-    let commitId = commitInfo.id;
-    let commit = repo.findCommit(commitId).unwrap();
-    let commitsDiff = repo.makeDiffOfCommitAndParent(&commit);
-
-    let fullFilesZipName = makeFullFilesZipName(outputPath, commitId);
-    let fullFilesZipFile = OpenOptions::new().write(true).create_new(true).open(&fullFilesZipName).unwrap();
-    let mut fullFilesZipWriter = ZipWriter::new(fullFilesZipFile);
-
-    let diffAndFullFilesZipName = makeDiffAndFullFilesZipName(outputPath, commitId);
-    let diffAndFullFilesZipFile = OpenOptions::new().write(true).create_new(true).open(diffAndFullFilesZipName).unwrap();
-    let mut diffAndFullFilesZipWriter = ZipWriter::new(diffAndFullFilesZipFile);
-
-    let zipOptions = ZipFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
-
-    reportDiffFile(&commit, &commitsDiff, &mut diffAndFullFilesZipWriter, &zipOptions);
-    reportFullFiles(&commitsDiff, repo, &mut fullFilesZipWriter, &mut diffAndFullFilesZipWriter, &zipOptions);
-
-    fullFilesZipWriter.finish().unwrap();
-    diffAndFullFilesZipWriter.finish().unwrap();
+    repo.findCommit(commitId).unwrap().as_object().short_id().unwrap().as_str().unwrap().into()
 }
 
-fn makeFullFilesZipName(outputPath: &Path, commitId: git2::Oid) -> PathBuf
+fn makeFullFilesZipPath(outputPath: &Path, fileNameStem: &str) -> PathBuf
 {
-    let mut fileName = outputPath.to_owned();
-    fileName.push(format!("{}.zip", commitId));
-    fileName
+    let mut filePath = outputPath.to_owned();
+    filePath.push(format!("{}.zip", fileNameStem));
+    filePath
 }
 
-fn makeDiffAndFullFilesZipName(outputPath: &Path, commitId: git2::Oid) -> PathBuf
+fn makeDiffAndFullFilesZipPath(outputPath: &Path, fileNameStem: &str) -> PathBuf
 {
-    let mut fileName = outputPath.to_owned();
-    fileName.push(format!("{}-diff.zip", commitId));
-    fileName
+    let mut filePath = outputPath.to_owned();
+    filePath.push(format!("{}-diff.zip", fileNameStem));
+    filePath
 }
 
 fn reportDiffFile(

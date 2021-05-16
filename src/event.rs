@@ -17,6 +17,8 @@ pub enum Event
     GenerateReportRequested,
     MarkCommitForReportToggled(gtk::TreePath),
     MonthFilterChanged(chrono::Month),
+    OpenOptionsRequested,
+    OutputFileNamesPatternChanged(String),
     OutputPathChanged(PathBuf),
     PartialOutputPathChanged(PathBuf),
     RepositoryChanged(Rc<Repository>),

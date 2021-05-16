@@ -16,6 +16,9 @@ pub enum Source
     CommitLogViewWidget,
     GenerateReportButton,
     MonthComboBox,
+    OpenOptionsButton,
+    OptionsDialog,
+    OptionsDialogWidget,
     OutputPathStore,
     RepositoryStore,
     YearSpinButton

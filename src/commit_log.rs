@@ -60,31 +60,23 @@ impl CommitLog
         }
 
         repo.iterateCommits(|commit| {
-            let message = getFirstLineOfMessage(&commit);
+            let summary = commit.summary().unwrap().into();
             let signature = commit.author();
             let date = chrono::Local.timestamp(signature.when().seconds(), ZERO_NANOSECONDS);
             let author = signature.name().unwrap_or(INVALID_UTF8).into();
             let email = signature.email().unwrap_or(INVALID_UTF8).into();
             let id = commit.id();
-            self.commits.push(CommitInfo {id, message, date, author, email, markedForReport: false});
+            self.commits.push(CommitInfo {id, summary, date, author, email, markedForReport: false});
         });
 
         self.sender.send((Source::CommitLog, Event::CommitLogFilled)).unwrap();
     }
 }
 
-fn getFirstLineOfMessage(commit: &git2::Commit) -> String
-{
-    match commit.message() {
-        Some(message) => message.lines().next().unwrap_or("").into(),
-        None => "".into()
-    }
-}
-
 pub struct CommitInfo
 {
     pub id: git2::Oid,
-    pub message: String,
+    pub summary: String,
     pub date: LocalDateTime,
     pub author: String,
     pub email: String,

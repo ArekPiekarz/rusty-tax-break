@@ -13,6 +13,8 @@ use crate::dispatcher::{EventHandlers, setupDispatching};
 use crate::generate_report_button::setupGenerateReportButton;
 use crate::gui_element_provider::GuiElementProvider;
 use crate::month_filter_combo_box::setupMonthFilterComboBox;
+use crate::open_options_button::setupOpenOptionsButton;
+use crate::options_dialog::OptionsDialog;
 use crate::output_path_store::OutputPathStore;
 use crate::report_generator::ReportGenerator;
 use crate::repository_path_label::RepositoryPathLabel;
@@ -37,6 +39,7 @@ impl Gui
         let guiElementProvider = GuiElementProvider::new(include_str!("main_window.glade"));
 
         let currentDate = chrono::Local::today();
+        let outputFileNamesPattern = "<commit_short_id> <commit_summary>";
         let applicationWindow = ApplicationWindow::new(&guiElementProvider);
         let chooseOutputFolderButton = makeChooseOutputFolderButton(&guiElementProvider, sender.clone());
         let chooseRepositoryFolderButton = makeChooseRepositoryFolderButton(&guiElementProvider, sender.clone());
@@ -45,11 +48,13 @@ impl Gui
         let commitLogFilterModel = CommitLogModelFilter::new(Rc::clone(&commitLog), &guiElementProvider, sender.clone());
         let commitLogModel = CommitLogModel::new(Rc::clone(&commitLog), &guiElementProvider);
         let commitLogView = CommitLogView::new(Rc::clone(&commitLog), &guiElementProvider, sender.clone());
+        let optionsDialog = OptionsDialog::new(outputFileNamesPattern, sender.clone());
         let outputPathLabel = OutputPathLabel::new(currentDate, &guiElementProvider);
         let outputPathStore = OutputPathStore::new(currentDate, sender.clone());
-        let reportGenerator = ReportGenerator::new(Rc::clone(&commitLog));
+        let reportGenerator = ReportGenerator::new(Rc::clone(&commitLog), outputFileNamesPattern);
         let repositoryStore = RepositoryStore::new(sender.clone());
         let repositoryPathLabel = RepositoryPathLabel::new(&guiElementProvider);
+        setupOpenOptionsButton(&guiElementProvider, sender.clone());
         setupGenerateReportButton(&guiElementProvider, sender.clone());
         setupCommitAuthorFilterEntry(&guiElementProvider, sender.clone());
         setupMonthFilterComboBox(&currentDate, &guiElementProvider, sender.clone());
@@ -63,6 +68,7 @@ impl Gui
             commitLogFilterModel,
             commitLogModel,
             commitLogView,
+            optionsDialog,
             outputPathLabel,
             outputPathStore,
             reportGenerator,

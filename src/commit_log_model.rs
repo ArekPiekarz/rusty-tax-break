@@ -56,7 +56,7 @@ impl CommitLogModel
                 &self.store.append(),
                 CommitLogColumn::allAsArrayOfU32(),
                 &[&DO_NOT_REPORT_COMMIT,
-                  &commit.message,
+                  &commit.summary,
                   &commit.date.format("%_d %b %Y %_H:%M:%S").to_string(),
                   &commit.author,
                   &commit.email,
