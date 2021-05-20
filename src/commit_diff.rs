@@ -12,7 +12,7 @@ pub fn makeCommitSummary(commit: &git2::Commit) -> String
         commit.author().name().unwrap(),
         commit.author().email().unwrap(),
         chrono::Local.timestamp(commit.time().seconds(), ZERO_NANOSECONDS).to_rfc2822(),
-        tabulateCommitMessage(commit.message().unwrap()))
+        tabulateCommitMessage(&getMessage(commit)))
 }
 
 pub fn makeFormattedDiff(diff: &git2::Diff) -> String
@@ -20,6 +20,14 @@ pub fn makeFormattedDiff(diff: &git2::Diff) -> String
     let mut diffFormatter = DiffFormatter::new();
     diff.print(git2::DiffFormat::Patch, |_delta, _hunk, line| diffFormatter.format(&line)).unwrap();
     diffFormatter.takeText()
+}
+
+fn getMessage(commit: &git2::Commit) -> String
+{
+    match commit.message() {
+        Some(message) => message.into(),
+        None => String::from_utf8_lossy(commit.message_bytes()).into()
+    }
 }
 
 fn tabulateCommitMessage(message: &str) -> String

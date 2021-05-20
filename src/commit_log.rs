@@ -60,7 +60,7 @@ impl CommitLog
         }
 
         repo.iterateCommits(|commit| {
-            let summary = commit.summary().unwrap().into();
+            let summary = getSummary(commit);
             let signature = commit.author();
             let date = chrono::Local.timestamp(signature.when().seconds(), ZERO_NANOSECONDS);
             let author = signature.name().unwrap_or(INVALID_UTF8).into();
@@ -70,6 +70,22 @@ impl CommitLog
         });
 
         self.sender.send((Source::CommitLog, Event::CommitLogFilled)).unwrap();
+    }
+}
+
+fn getSummary(commit: &git2::Commit) -> String
+{
+    match commit.summary() {
+        Some(summary) => summary.into(),
+        None => getSummaryFromRaw(commit)
+    }
+}
+
+fn getSummaryFromRaw(commit: &git2::Commit) -> String
+{
+    match commit.summary_bytes() {
+        Some(bytes) => String::from_utf8_lossy(bytes).into(),
+        None => "<UNKNOWN SUMMARY>".into()
     }
 }
 
