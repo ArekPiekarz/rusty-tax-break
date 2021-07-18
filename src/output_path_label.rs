@@ -5,7 +5,7 @@ use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
 use chrono::Datelike as _;
-use gtk::LabelExt as _;
+use gtk::prelude::LabelExt as _;
 use std::path::Path;
 
 

@@ -4,12 +4,15 @@ use crate::gui_element_provider::GuiElementProvider;
 use crate::line_number::LineNumber;
 use crate::source::Source;
 
-use gtk::CssProviderExt as _;
-use gtk::StyleContextExt as _;
-use gtk::TextBufferExt as _;
-use gtk::TextTagTableExt as _;
-use gtk::TextViewExt as _;
-use gtk::WidgetExt as _;
+use gtk::gdk;
+use gtk::glib;
+use gtk::pango;
+use gtk::prelude::CssProviderExt as _;
+use gtk::prelude::StyleContextExt as _;
+use gtk::prelude::TextBufferExt as _;
+use gtk::prelude::TextTagTableExt as _;
+use gtk::prelude::TextViewExt as _;
+use gtk::prelude::WidgetExt as _;
 use std::cmp::{min, max};
 
 const NO_SEARCH_LIMIT: Option<&gtk::TextIter> = None;
@@ -47,7 +50,7 @@ impl TextView
     {
         let widget = guiElementProvider.get::<gtk::TextView>(name);
         let newSelf = Self{
-            buffer: widget.get_buffer().unwrap(),
+            buffer: widget.buffer().unwrap(),
             sender,
             source,
             style: Style::new(&widget),
@@ -69,7 +72,7 @@ impl TextView
 
     pub fn registerTags(&self, tags: &[&gtk::TextTag])
     {
-        let tagTable = self.buffer.get_tag_table().unwrap();
+        let tagTable = self.buffer.tag_table().unwrap();
         for tag in tags {
             assert!(tagTable.add(*tag));
         }
@@ -79,18 +82,18 @@ impl TextView
     {
         self.buffer.apply_tag(
             tag,
-            &self.buffer.get_iter_at_line(startLine.into()),
-            &self.buffer.get_iter_at_line(endLine.into()));
+            &self.buffer.iter_at_line(startLine.into()),
+            &self.buffer.iter_at_line(endLine.into()));
     }
 
     pub fn applyTagUntilEnd(&self, tag: &gtk::TextTag, startLine: LineNumber)
     {
-        self.buffer.apply_tag(tag, &self.buffer.get_iter_at_line(startLine.into()), &self.buffer.get_end_iter());
+        self.buffer.apply_tag(tag, &self.buffer.iter_at_line(startLine.into()), &self.buffer.end_iter());
     }
 
     pub fn applyTagUntilMatchEnd(&self, tag: &gtk::TextTag, startLine: LineNumber, pattern: &str)
     {
-        let startIter = self.buffer.get_iter_at_line(startLine.into());
+        let startIter = self.buffer.iter_at_line(startLine.into());
         let endIter = startIter.forward_search(pattern, SEARCH_VISIBLE_TEXT, NO_SEARCH_LIMIT).unwrap().1;
         self.buffer.apply_tag(tag, &startIter, &endIter);
     }
@@ -140,7 +143,7 @@ impl TextView
 
     fn calculateNewFontSize(&self, event: &gdk::EventScroll) -> FontSize
     {
-        match getY(event.get_delta()) {
+        match getY(event.delta()) {
             y if y < 0.0 => self.calculateHigherFontSize(),
             y if y > 0.0 => self.calculateLowerFontSize(),
             _ => self.style.font.size
@@ -168,7 +171,7 @@ impl TextView
 
 fn onScrolled(event: &gdk::EventScroll, sender: &Sender, source: Source) -> gtk::Inhibit
 {
-    if !event.get_state().contains(gdk::ModifierType::CONTROL_MASK) {
+    if !event.state().contains(gdk::ModifierType::CONTROL_MASK) {
         return FORWARD_EVENT;
     }
 
@@ -188,7 +191,7 @@ impl Style
         where T: glib::IsA<gtk::Widget>
     {
         let cssProvider = gtk::CssProvider::new();
-        widget.get_style_context().add_provider(&cssProvider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
+        widget.style_context().add_provider(&cssProvider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         Self{
             cssProvider,
@@ -224,17 +227,17 @@ impl Font
 fn getFontDescription<T>(widget: &T) -> pango::FontDescription
     where T: glib::IsA<gtk::Widget>
 {
-    widget.get_pango_context().get_font_description().unwrap()
+    widget.pango_context().font_description().unwrap()
 }
 
 fn getFontSize(fontDescription: &pango::FontDescription) -> FontSize
 {
-    fontDescription.get_size() / pango::SCALE
+    fontDescription.size() / pango::SCALE
 }
 
 fn getFontFamily(fontDescription: &pango::FontDescription) -> FontFamily
 {
-    fontDescription.get_family().unwrap().into()
+    fontDescription.family().unwrap().into()
 }
 
 const fn getY(coordinates: (f64, f64)) -> f64

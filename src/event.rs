@@ -1,5 +1,6 @@
 use crate::repository::Repository;
 
+use gtk::gdk;
 use std::path::PathBuf;
 use std::rc::Rc;
 

@@ -1,6 +1,7 @@
 use crate::event::Event;
 use crate::source::Source;
 
+use gtk::glib;
 
 pub const CONSUME_EVENT: gtk::Inhibit = gtk::Inhibit(true);
 pub const FORWARD_EVENT: gtk::Inhibit = gtk::Inhibit(false);

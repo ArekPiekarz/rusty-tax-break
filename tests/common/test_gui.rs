@@ -1,7 +1,8 @@
 use crate::common::event_processing::processEvents;
 
-use glib::Cast as _;
-use gtk::GtkWindowExt as _;
+use gtk::glib;
+use gtk::prelude::Cast as _;
+use gtk::prelude::GtkWindowExt as _;
 
 
 pub struct TestGui

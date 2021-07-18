@@ -6,8 +6,8 @@ use crate::source::Source;
 
 use chrono::Datelike as _;
 use gtk::EditableSignals as _;
-use gtk::EntryExt as _;
-use gtk::SpinButtonExt as _;
+use gtk::prelude::EntryExt as _;
+use gtk::prelude::SpinButtonExt as _;
 
 
 pub fn setupYearFilterSpinButton(date: &LocalDate, guiElementProvider: &GuiElementProvider, sender: Sender)
@@ -16,10 +16,10 @@ pub fn setupYearFilterSpinButton(date: &LocalDate, guiElementProvider: &GuiEleme
     let sender2 = sender.clone();
 
     yearFilterSpinButton.connect_changed(move |widget| {
-        sender.send((Source::YearSpinButton, Event::YearFilterChanged(widget.get_value_as_int()))).unwrap();
+        sender.send((Source::YearSpinButton, Event::YearFilterChanged(widget.value_as_int()))).unwrap();
     });
     yearFilterSpinButton.connect_activate(move |widget| {
-        sender2.send((Source::YearSpinButton, Event::YearFilterChanged(widget.get_value_as_int()))).unwrap();
+        sender2.send((Source::YearSpinButton, Event::YearFilterChanged(widget.value_as_int()))).unwrap();
     });
 
     yearFilterSpinButton.set_value(date.year().into());

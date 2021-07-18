@@ -7,6 +7,7 @@ use crate::common::gui_interactions::{acceptDialog, clickChooseRepositoryFolderB
 use crate::common::repository_setup::{findLastCommitDateForLogView, makeCommit, makeNewStagedFile};
 use crate::common::test_setup::{COMMIT_AUTHOR, COMMIT_EMAIL, makeGui, setupTest};
 
+use gtk::glib;
 use rusty_fork::rusty_fork_test;
 use std::path::PathBuf;
 
@@ -15,6 +16,8 @@ rusty_fork_test! {
 #[test]
 fn chooseFilledRepository()
 {
+    let context = glib::MainContext::default();
+    let _guard = context.acquire().unwrap();
     let (_repoDirGuard, repoDir) = setupTest();
     let repoDirStr = repoDir.to_str().unwrap();
     let filePath = PathBuf::from("some_file");

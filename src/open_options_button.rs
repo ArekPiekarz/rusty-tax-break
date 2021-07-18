@@ -3,7 +3,7 @@ use crate::event_handling::Sender;
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
-use gtk::ButtonExt as _;
+use gtk::prelude::ButtonExt as _;
 
 
 pub fn setupOpenOptionsButton(guiElementProvider: &GuiElementProvider, sender: Sender)

@@ -6,8 +6,9 @@ use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
 use chrono::Datelike as _;
-use gtk::TreeModelExt as _;
-use gtk::TreeModelFilterExt as _;
+use gtk::glib;
+use gtk::prelude::TreeModelExt as _;
+use gtk::prelude::TreeModelFilterExt as _;
 use std::cell::RefCell;
 use std::convert::TryInto as _;
 use std::rc::Rc;
@@ -88,11 +89,11 @@ fn setupFilterFunction(
     yearFilter: YearFilter)
 {
     modelFilter.set_visible_func(move |model, iter| {
-        if isRowEmpty(model, iter).unwrap() {
+        if isRowEmpty(model, iter) {
             return false;
         }
 
-        let originalRow = model.get_value(iter, CommitLogColumn::OriginalRow.into()).get_some::<OriginalRow>().unwrap()
+        let originalRow = model.value(iter, CommitLogColumn::OriginalRow.into()).get::<OriginalRow>().unwrap()
             .try_into().unwrap();
         let date = commitLog.borrow().getCommit(originalRow).unwrap().date;
         if date.year() != *yearFilter.borrow() {
@@ -106,12 +107,18 @@ fn setupFilterFunction(
         if authorFilter.is_empty() {
             return true;
         }
-        let author = model.get_value(iter, CommitLogColumn::Author.into()).get::<String>().unwrap().unwrap();
+        let author = model.value(iter, CommitLogColumn::Author.into()).get::<String>().unwrap();
         author == *authorFilter
     });
 }
 
-fn isRowEmpty(model: &gtk::TreeModel, iter: &gtk::TreeIter) -> Result<bool, glib::value::GetError>
+fn isRowEmpty(model: &gtk::TreeModel, iter: &gtk::TreeIter) -> bool
 {
-    model.get_value(iter, CommitLogColumn::Date.into()).get::<&str>().map(|opt| opt.is_none())
+    match model.value(iter, CommitLogColumn::Date.into()).get::<&str>() {
+        Ok(text) => text.is_empty(),
+        Err(error) => match error {
+            glib::value::ValueTypeMismatchOrNoneError::WrongValueType(e) => panic!("Wrong value type: {}", e),
+            glib::value::ValueTypeMismatchOrNoneError::UnexpectedNone => true
+        }
+    }
 }

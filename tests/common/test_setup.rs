@@ -4,7 +4,8 @@ use crate::common::test_gui::TestGui;
 use rusty_tax_break::gui::Gui;
 
 use color_backtrace::BacktracePrinter;
-use glib::{Cast as _, ObjectExt as _};
+use gtk::prelude::Cast as _;
+use gtk::prelude::ObjectExt as _;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use tempfile::{tempdir, TempDir};
@@ -78,7 +79,7 @@ fn getAppWindow() -> gtk::ApplicationWindow
         1 => topLevelWindows.remove(0).downcast::<gtk::ApplicationWindow>().unwrap(),
         2 => {
             let tooltipWindow = topLevelWindows[1].downcast_ref::<gtk::Window>().unwrap();
-            assert_eq!(tooltipWindow.get_type().name(), "GtkWindow");
+            assert_eq!(tooltipWindow.type_().name(), "GtkWindow");
             topLevelWindows.remove(0).downcast::<gtk::ApplicationWindow>().unwrap()
         },
         count => panic!("Wrong number of windows, expected 1 or 2, got {}: {:?}", count, topLevelWindows)

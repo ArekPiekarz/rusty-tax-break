@@ -5,9 +5,9 @@ use crate::event_handling::{EventHandler, onUnknown};
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
-use gtk::GtkListStoreExt as _;
+use gtk::prelude::GtkListStoreExt as _;
 use gtk::prelude::GtkListStoreExtManual as _;
-use gtk::TreeModelExt as _;
+use gtk::prelude::TreeModelExt as _;
 use std::cell::RefCell;
 use std::convert::TryInto as _;
 use std::rc::Rc;
@@ -54,22 +54,21 @@ impl CommitLogModel
         for (row, commit) in self.commitLog.borrow().getCommits().iter().enumerate() {
             self.store.set(
                 &self.store.append(),
-                CommitLogColumn::allAsArrayOfU32(),
-                &[&DO_NOT_REPORT_COMMIT,
-                  &commit.summary,
-                  &commit.date.format("%_d %b %Y %_H:%M:%S").to_string(),
-                  &commit.author,
-                  &commit.email,
-                  &(row.try_to::<OriginalRow>().unwrap())]);
+                &[(CommitLogColumn::Report.into(),      &DO_NOT_REPORT_COMMIT),
+                  (CommitLogColumn::Message.into(),     &commit.summary),
+                  (CommitLogColumn::Date.into(),        &commit.date.format("%_d %b %Y %_H:%M:%S").to_string()),
+                  (CommitLogColumn::Author.into(),      &commit.author),
+                  (CommitLogColumn::Email.into(),       &commit.email),
+                  (CommitLogColumn::OriginalRow.into(), &(row.try_to::<OriginalRow>().unwrap()))]);
         }
     }
 
     fn onMarkCommitForReportToggled(&self, treePath: &gtk::TreePath)
     {
-        let iter = self.store.get_iter(treePath).unwrap();
-        let report = !self.store.get_value(&iter, CommitLogColumn::Report.into()).get_some::<bool>().unwrap();
-        self.store.set(&iter, &[CommitLogColumn::Report.into()], &[&report]);
-        let row = self.store.get_value(&iter, CommitLogColumn::OriginalRow.into()).get_some::<OriginalRow>().unwrap()
+        let iter = self.store.iter(treePath).unwrap();
+        let report = !self.store.value(&iter, CommitLogColumn::Report.into()).get::<bool>().unwrap();
+        self.store.set(&iter, &[(CommitLogColumn::Report.into(), &report)]);
+        let row = self.store.value(&iter, CommitLogColumn::OriginalRow.into()).get::<OriginalRow>().unwrap()
             .try_into().unwrap();
         self.commitLog.borrow_mut().setMarkedForReport(row, report);
     }

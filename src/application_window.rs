@@ -1,7 +1,7 @@
 use crate::event_handling::FORWARD_EVENT;
 use crate::gui_element_provider::GuiElementProvider;
 
-use gtk::WidgetExt as _;
+use gtk::prelude::WidgetExt as _;
 
 
 pub struct ApplicationWindow

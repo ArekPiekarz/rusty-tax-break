@@ -15,6 +15,7 @@ use crate::repository_path_label::RepositoryPathLabel;
 use crate::repository_store::RepositoryStore;
 use crate::source::Source;
 
+use gtk::glib;
 use std::cell::RefCell;
 use std::rc::Rc;
 

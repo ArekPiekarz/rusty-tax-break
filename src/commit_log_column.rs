@@ -8,14 +8,6 @@ pub enum CommitLogColumn
     OriginalRow
 }
 
-impl CommitLogColumn
-{
-    pub fn allAsArrayOfU32() -> &'static [u32]
-    {
-        &[0, 1, 2, 3, 4, 5]
-    }
-}
-
 impl From<CommitLogColumn> for i32
 {
     fn from(value: CommitLogColumn) -> Self

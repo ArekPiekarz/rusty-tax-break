@@ -4,11 +4,11 @@ use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 use crate::tree_view_column_config::{ColumnRenderer, ToggledAction, TreeViewColumnConfig};
 
-use gtk::CellLayoutExt as _;
-use gtk::CellRendererToggleExt as _;
-use gtk::TreeSelectionExt as _;
-use gtk::TreeViewColumnExt as _;
-use gtk::TreeViewExt as _;
+use gtk::prelude::CellLayoutExt as _;
+use gtk::prelude::CellRendererToggleExt as _;
+use gtk::prelude::TreeSelectionExt as _;
+use gtk::prelude::TreeViewColumnExt as _;
+use gtk::prelude::TreeViewExt as _;
 
 const EXPAND_IN_LAYOUT : bool = true;
 
@@ -40,7 +40,7 @@ impl TreeView
 
     fn connectSelection(&self, sender: Sender, eventSource: Source)
     {
-        self.widget.get_selection().connect_changed(move |selection|
+        self.widget.selection().connect_changed(move |selection|
             sender.send((eventSource, Event::SelectionChanged(selection.clone()))).unwrap());
     }
 
@@ -59,7 +59,7 @@ impl TreeView
     {
         let renderer = gtk::CellRendererText::new();
         let index = columnConfig.index;
-        let column = self.widget.get_column(index).unwrap();
+        let column = self.widget.column(index).unwrap();
         column.pack_start(&renderer, EXPAND_IN_LAYOUT);
         column.add_attribute(&renderer, "text", index);
         column.set_resizable(columnConfig.isResizable);
@@ -70,7 +70,7 @@ impl TreeView
     {
         let renderer = gtk::CellRendererToggle::new();
         renderer.connect_toggled(move |renderer, treePath| { toggledAction(renderer, treePath); });
-        let column = self.widget.get_column(index).unwrap();
+        let column = self.widget.column(index).unwrap();
         column.pack_start(&renderer, EXPAND_IN_LAYOUT);
         column.add_attribute(&renderer, "active", index);
         column.set_resizable(isResizable);

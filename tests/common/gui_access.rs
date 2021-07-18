@@ -1,6 +1,6 @@
 use crate::common::test_gui::TestGui;
 
-use glib::Cast as _;
+use gtk::prelude::Cast as _;
 
 
 pub fn findChooseRepositoryFolderButton(gui: &TestGui) -> gtk::Button

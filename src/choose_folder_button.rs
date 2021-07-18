@@ -3,11 +3,11 @@ use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
-use gtk::ButtonExt as _;
-use gtk::DialogExt as _;
-use gtk::FileChooserExt as _;
-use gtk::GtkWindowExt as _;
-use gtk::WidgetExt as _;
+use gtk::prelude::ButtonExt as _;
+use gtk::prelude::DialogExt as _;
+use gtk::prelude::FileChooserExt as _;
+use gtk::prelude::GtkWindowExt as _;
+use gtk::prelude::WidgetExt as _;
 
 
 pub struct ChooseFolderButton
@@ -97,7 +97,7 @@ impl ChooseFolderButton
             Some(dialog) => dialog
         };
 
-        if let Some(folder) = dialog.get_filename() {
+        if let Some(folder) = dialog.filename() {
             self.sender.send((self.source, Event::FolderChosen(folder))).unwrap();
         }
         dialog.close();

@@ -3,7 +3,11 @@ use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
-use gtk::{ButtonExt as _, DialogExt as _, EntryExt as _, GtkWindowExt as _, WidgetExt as _};
+use gtk::prelude::ButtonExt as _;
+use gtk::prelude::DialogExt as _;
+use gtk::prelude::EntryExt as _;
+use gtk::prelude::GtkWindowExt as _;
+use gtk::prelude::WidgetExt as _;
 
 
 pub struct OptionsDialog
@@ -82,7 +86,7 @@ impl OptionsDialog
             }
         };
 
-        let newPattern = widgets.outputFileNamesPatternEntry.get_text().to_string();
+        let newPattern = widgets.outputFileNamesPatternEntry.text().to_string();
         if self.outputFileNamesPattern != newPattern {
             self.outputFileNamesPattern = newPattern.clone();
             self.sender.send((Source::OptionsDialog, Event::OutputFileNamesPatternChanged(newPattern))).unwrap();

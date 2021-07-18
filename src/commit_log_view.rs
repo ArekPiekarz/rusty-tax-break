@@ -7,8 +7,8 @@ use crate::source::Source;
 use crate::tree_view::TreeView;
 use crate::tree_view_column_config::{ColumnRenderer, TreeViewColumnConfig};
 
-use gtk::TreeSelectionExt as _;
-use gtk::TreeModelExt as _;
+use gtk::prelude::TreeSelectionExt as _;
+use gtk::prelude::TreeModelExt as _;
 use std::cell::RefCell;
 use std::convert::TryInto as _;
 use std::rc::Rc;
@@ -49,9 +49,9 @@ impl CommitLogView
 
     fn handleSelectionChanged(&self, selection: &gtk::TreeSelection)
     {
-        match selection.get_selected() {
+        match selection.selected() {
             Some((model, iter)) => {
-                let row = model.get_value(&iter, CommitLogColumn::OriginalRow.into()).get_some::<OriginalRow>().unwrap()
+                let row = model.value(&iter, CommitLogColumn::OriginalRow.into()).get::<OriginalRow>().unwrap()
                     .try_into().unwrap();
                 let commitId = self.commitLog.borrow().getCommit(row).unwrap().id;
                 self.sender.send((Source::CommitLogView, Event::CommitSelected(commitId))).unwrap();

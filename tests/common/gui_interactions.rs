@@ -2,10 +2,10 @@ use crate::common::event_processing::processEvents;
 use crate::common::gui_access::{findChooseOutputFolderButton, findChooseRepositoryFolderButton};
 use crate::common::test_gui::TestGui;
 
-use gtk::ButtonExt as _;
-use gtk::DialogExt as _;
-use gtk::FileChooserExt as _;
-use gtk::WidgetExt as _;
+use gtk::prelude::ButtonExt as _;
+use gtk::prelude::DialogExt as _;
+use gtk::prelude::FileChooserExt as _;
+use gtk::prelude::WidgetExt as _;
 use std::path::Path;
 
 
@@ -26,7 +26,7 @@ pub fn setCurrentFolderInDialog(path: &Path, dialog: &gtk::FileChooserDialog)
     // and needs time to propagate the change.
     dialog.set_current_folder(path);
     processEvents();
-    while dialog.get_current_folder() != Some(path.into()) {
+    while dialog.current_folder() != Some(path.into()) {
         processEvents();
     }
 }

@@ -3,9 +3,9 @@ use crate::common::gui_access::{findCommitLogView, findOutputPathLabel, findRepo
 use crate::common::test_gui::TestGui;
 
 use chrono::Datelike as _;
-use gtk::LabelExt as _;
-use gtk::TreeModelExt as _;
-use gtk::TreeViewExt as _;
+use gtk::prelude::LabelExt as _;
+use gtk::prelude::TreeModelExt as _;
+use gtk::prelude::TreeViewExt as _;
 use std::path::Path;
 
 const CONTINUE_ITERATING_MODEL: bool = false;
@@ -14,7 +14,7 @@ const CONTINUE_ITERATING_MODEL: bool = false;
 pub fn assertRepositoryPathLabelTextIs(expectedText: &str, gui: &TestGui)
 {
     let label = findRepositoryPathLabel(gui);
-    assert_eq!(label.get_text().as_str(), expectedText, "\nActual repository path label text differs from expected");
+    assert_eq!(label.text().as_str(), expectedText, "\nActual repository path label text differs from expected");
 }
 
 pub fn assertRepositoryPathLabelTextIsPlaceholder(gui: &TestGui)
@@ -59,7 +59,7 @@ pub struct CommitLogRow
 pub fn assertOutputPathLabelTextIs(expectedText: &str, gui: &TestGui)
 {
     let label = findOutputPathLabel(gui);
-    assert_eq!(label.get_text().as_str(), expectedText, "\nActual output path label text differs from expected");
+    assert_eq!(label.text().as_str(), expectedText, "\nActual output path label text differs from expected");
 }
 
 pub fn assertOutputPathLabelTextIsPlaceholder(date: &LocalDate, gui: &TestGui)
@@ -78,7 +78,7 @@ fn collectCommitLogViewContent(gui: &TestGui) -> Vec<CommitLogRow>
 {
     let mut content = vec![];
     let view = findCommitLogView(gui);
-    view.get_model().unwrap().foreach(|model, _row, iter| {
+    view.model().unwrap().foreach(|model, _row, iter| {
         content.push(CommitLogRow{
             markedForReport: getMarkedForReportCell(model, iter),
             message: getMessageCell(model, iter),
@@ -118,12 +118,12 @@ fn getEmailCell(model: &gtk::TreeModel, iter: &gtk::TreeIter) -> String
 
 fn getCellBool(model: &gtk::TreeModel, iter: &gtk::TreeIter, column: i32) -> bool
 {
-    model.get_value(iter, column).get::<bool>().unwrap().unwrap()
+    model.value(iter, column).get::<bool>().unwrap()
 }
 
 fn getCellString(model: &gtk::TreeModel, iter: &gtk::TreeIter, column: i32) -> String
 {
-    model.get_value(iter, column).get::<String>().unwrap().unwrap()
+    model.value(iter, column).get::<String>().unwrap()
 }
 
 enum CommitLogColumn

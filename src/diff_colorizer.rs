@@ -1,7 +1,7 @@
 use crate::line_number::LineNumber;
 use crate::text_view::TextView;
 
-use gtk::TextTagExt as _;
+use gtk::prelude::TextTagExt as _;
 
 
 pub struct DiffColorizer
@@ -196,6 +196,6 @@ impl DiffColorizer
 fn makeTag(name: &str) -> gtk::TextTag
 {
     let tag = gtk::TextTag::new(Some(name));
-    tag.set_property_foreground(Some(name));
+    tag.set_foreground(Some(name));
     tag
 }

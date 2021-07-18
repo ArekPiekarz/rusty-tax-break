@@ -4,7 +4,7 @@ use crate::gui_element_provider::GuiElementProvider;
 use crate::repository::Repository;
 use crate::source::Source;
 
-use gtk::LabelExt as _;
+use gtk::prelude::LabelExt as _;
 use std::rc::Rc;
 
 
