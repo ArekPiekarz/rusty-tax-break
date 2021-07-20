@@ -10,7 +10,7 @@ pub enum Event
 {
     Clicked,
     CommitAuthorFilterChanged(CommitAuthorFilter),
-    CommitLogFilled,
+    CommitLogChanged,
     CommitSelected(git2::Oid),
     CommitUnselected,
     DialogResponded(gtk::ResponseType),
@@ -20,7 +20,7 @@ pub enum Event
     MonthFilterChanged(chrono::Month),
     OpenOptionsRequested,
     OutputFileNamesPatternChanged(String),
-    OutputPathChanged(PathBuf),
+    OutputPathChanged(OutputPathInfo),
     PartialOutputPathChanged(PathBuf),
     RepositoryChanged(Rc<Repository>),
     SelectionChanged(gtk::TreeSelection),
@@ -31,3 +31,6 @@ pub enum Event
 pub type CommitAuthorFilter = String;
 pub type CommitAuthorFilterStr = str;
 pub type Year = i32;
+
+#[derive(Debug)]
+pub struct OutputPathInfo{pub full: PathBuf, pub prefix: PathBuf}

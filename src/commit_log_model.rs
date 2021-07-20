@@ -27,7 +27,7 @@ impl EventHandler for CommitLogModel
     fn handle(&mut self, source: Source, event: &Event)
     {
         match event {
-            Event::CommitLogFilled                      => self.onCommitLogFilled(),
+            Event::CommitLogChanged                     => self.onCommitLogChanged(),
             Event::MarkCommitForReportToggled(treePath) => self.onMarkCommitForReportToggled(treePath),
             _ => onUnknown(source, event)
         }
@@ -38,16 +38,15 @@ impl CommitLogModel
 {
     pub fn new(commitLog: Rc<RefCell<CommitLog>>, guiElementProvider: &GuiElementProvider) -> Self
     {
-        Self{
-            commitLog,
-            store: guiElementProvider.get::<gtk::ListStore>("commitLogStore")
-        }
+        let newSelf = Self{commitLog, store: guiElementProvider.get::<gtk::ListStore>("commitLogStore")};
+        newSelf.onCommitLogChanged();
+        newSelf
     }
 
 
     // private
 
-    fn onCommitLogFilled(&self)
+    fn onCommitLogChanged(&self)
     {
         self.store.clear();
         // for date formatting below, see https://docs.rs/chrono/0.4.19/chrono/format/strftime/index.html

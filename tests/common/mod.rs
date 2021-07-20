@@ -7,3 +7,4 @@ pub mod test_gui;
 pub mod test_setup;
 
 mod event_processing;
+mod test_resources;

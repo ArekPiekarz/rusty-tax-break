@@ -1,6 +1,6 @@
 use crate::commit_diff::{makeCommitSummary, makeFormattedDiff};
 use crate::commit_log::{CommitLog, CommitInfo};
-use crate::event::Event;
+use crate::event::{Event, OutputPathInfo};
 use crate::event_handling::{EventHandler, onUnknown};
 use crate::repository::Repository;
 use crate::source::Source;
@@ -33,7 +33,7 @@ impl EventHandler for ReportGenerator
         match event {
             Event::GenerateReportRequested                => self.generateReport(),
             Event::OutputFileNamesPatternChanged(pattern) => self.onOutputFileNamesPatternChanged(pattern),
-            Event::OutputPathChanged(path)                => self.onOutputPathChanged(path),
+            Event::OutputPathChanged(pathInfo)            => self.onOutputPathChanged(pathInfo),
             Event::RepositoryChanged(repo)                => self.onRepositoryChanged(repo),
             _ => onUnknown(source, event)
         }
@@ -42,9 +42,14 @@ impl EventHandler for ReportGenerator
 
 impl ReportGenerator
 {
-    pub fn new(commitLog: Rc<RefCell<CommitLog>>, outputFileNamesPattern: &str) -> Self
+    pub fn new(
+        commitLog: Rc<RefCell<CommitLog>>,
+        repo: Option<Rc<Repository>>,
+        outputPath: Option<PathBuf>,
+        outputFileNamesPattern: &str)
+        -> Self
     {
-        Self{commitLog, repo: None, outputPath: None, outputFileNamesPattern: outputFileNamesPattern.into()}
+        Self{commitLog, repo, outputPath, outputFileNamesPattern: outputFileNamesPattern.into()}
     }
 
 
@@ -55,21 +60,21 @@ impl ReportGenerator
         self.outputFileNamesPattern = pattern.into();
     }
 
-    fn onOutputPathChanged(&mut self, path: &Path)
+    fn onOutputPathChanged(&mut self, pathInfo: &OutputPathInfo)
     {
-        self.outputPath = Some(path.into());
+        self.outputPath = Some(pathInfo.full.clone());
     }
 
     fn generateReport(&self)
     {
         let repo = match &self.repo {
             Some(repo) => repo,
-            None => { return; }
+            None => return
         };
 
         let outputPath = match &self.outputPath {
             Some(path) => path,
-            None => { return; }
+            None => return
         };
 
         std::fs::create_dir_all(&outputPath).unwrap();

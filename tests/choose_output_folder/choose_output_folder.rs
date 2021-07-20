@@ -16,9 +16,9 @@ fn chooseOutputFolder()
 {
     let context = glib::MainContext::default();
     let _guard = context.acquire().unwrap();
-    setupTestWithoutRepo();
+    let testResources = setupTestWithoutRepo();
     let (_outputPathPrefixGuard, outputPathPrefix) = makeTemporaryDir();
-    let gui = makeGui();
+    let gui = makeGui(testResources.getConfigFilePath());
     let currentDate = getCurrentDate();
     assertOutputPathLabelTextIsPlaceholder(&currentDate, &gui);
 

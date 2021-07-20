@@ -15,8 +15,8 @@ fn cancelChoosingOutputFolder()
 {
     let context = glib::MainContext::default();
     let _guard = context.acquire().unwrap();
-    setupTestWithoutRepo();
-    let gui = makeGui();
+    let testResources = setupTestWithoutRepo();
+    let gui = makeGui(testResources.getConfigFilePath());
     let currentDate = getCurrentDate();
     assertOutputPathLabelTextIsPlaceholder(&currentDate, &gui);
 

@@ -1,3 +1,4 @@
+use crate::config_store::Config;
 use crate::event::Event;
 use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::repository::Repository;
@@ -18,7 +19,7 @@ impl EventHandler for RepositoryStore
     fn handle(&mut self, source: Source, event: &Event)
     {
         match event {
-            Event::FolderChosen(folderUri) => self.handleFolderChosen(&folderUri),
+            Event::FolderChosen(path) => self.onFolderChosen(&path),
             _ => onUnknown(source, event)
         }
     }
@@ -26,15 +27,43 @@ impl EventHandler for RepositoryStore
 
 impl RepositoryStore
 {
-    pub fn new(sender: Sender) -> Self
+    pub fn new(config: &Config, sender: Sender) -> Self
     {
-        Self{repo: None, sender}
+        match &config.repository {
+            Some(path) => Self::newFromPath(path, sender),
+            None => Self{repo: None, sender}
+        }
     }
 
+    pub fn getRepository(&self) -> &Option<Rc<Repository>>
+    {
+        &self.repo
+    }
+
+    pub fn getRepositoryPath(&self) -> Option<&Path>
+    {
+        match &self.repo {
+            Some(repo) => Some(repo.getPath()),
+            None => None
+        }
+    }
 
     // private
 
-    fn handleFolderChosen(&mut self, path: &Path)
+    fn newFromPath(path: &Path, sender: Sender) -> Self
+    {
+        match git2::Repository::open(path) {
+            Ok(gitRepo) => {
+                Self{repo: Some(Rc::new(Repository::new(gitRepo, path.into()))), sender}
+            },
+            Err(error) => {
+                warnRepoFailedToOpen(path, error);
+                Self{repo: None, sender}
+            }
+        }
+    }
+
+    fn onFolderChosen(&mut self, path: &Path)
     {
         if let Some(repo) = &self.repo {
             if repo.getPath() == path {
@@ -49,9 +78,14 @@ impl RepositoryStore
                 self.repo = Some(Rc::clone(&repository));
                 self.sender.send((Source::RepositoryStore, Event::RepositoryChanged(repository))).unwrap();
             },
-            Err(e) => {
-                eprintln!("Failed to open repository at {:?}, cause: {}", path, e);
+            Err(error) => {
+                warnRepoFailedToOpen(path, error);
             }
         }
     }
+}
+
+fn warnRepoFailedToOpen(path: &Path, error: git2::Error)
+{
+    eprintln!("Failed to open repository at {:?}, cause: {}", path, error);
 }

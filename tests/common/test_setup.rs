@@ -1,6 +1,8 @@
 use crate::common::date_time::LocalDate;
 use crate::common::test_gui::TestGui;
+use crate::common::test_resources::TestResources;
 
+use rusty_tax_break::config_path::ConfigPath;
 use rusty_tax_break::gui::Gui;
 
 use color_backtrace::BacktracePrinter;
@@ -8,24 +10,29 @@ use gtk::prelude::Cast as _;
 use gtk::prelude::ObjectExt as _;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use tempfile::{tempdir, TempDir};
+use tempfile::{NamedTempFile, tempdir, TempDir};
 use termcolor::{ColorChoice, StandardStream};
 
 pub const COMMIT_AUTHOR: &str = "John Smith";
 pub const COMMIT_EMAIL: &str = "john.smith@example.com";
 
 
-pub fn setupTest() -> (TempDir, PathBuf)
+#[must_use]
+pub fn setupTest() -> TestResources
 {
     setupPanicHandler();
+    let configFileGuard = makeTemporaryFile();
     let (repoDirGuard, repoDirPath) = makeTemporaryDir();
     initializeGitRepository(&repoDirPath);
-    (repoDirGuard, repoDirPath)
+    TestResources::new().withConfig(configFileGuard).withRepo(repoDirGuard)
 }
 
-pub fn setupTestWithoutRepo()
+#[must_use]
+pub fn setupTestWithoutRepo() -> TestResources
 {
     setupPanicHandler();
+    let configFileGuard = makeTemporaryFile();
+    TestResources::new().withConfig(configFileGuard)
 }
 
 pub fn makeTemporaryDir() -> (TempDir, PathBuf)
@@ -40,9 +47,9 @@ pub fn getCurrentDate() -> LocalDate
     chrono::Local::today()
 }
 
-pub fn makeGui() -> TestGui
+pub fn makeGui(configPath: &Path) -> TestGui
 {
-    let gui = Gui::new();
+    let gui = Gui::new(&ConfigPath::new(configPath));
     gui.show();
     TestGui::new(getAppWindow())
 }
@@ -53,6 +60,11 @@ pub fn makeGui() -> TestGui
 fn setupPanicHandler()
 {
     BacktracePrinter::default().install(Box::new(StandardStream::stderr(ColorChoice::Always)));
+}
+
+fn makeTemporaryFile() -> NamedTempFile
+{
+    NamedTempFile::new().unwrap()
 }
 
 fn initializeGitRepository(repoDir: &Path)

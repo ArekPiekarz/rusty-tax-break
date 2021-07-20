@@ -1,5 +1,6 @@
+use crate::config_store::Config;
 use crate::date_time::LocalDate;
-use crate::event::Event;
+use crate::event::{Event, OutputPathInfo};
 use crate::event_handling::{EventHandler, onUnknown};
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
@@ -19,7 +20,7 @@ impl EventHandler for OutputPathLabel
     fn handle(&mut self, source: Source, event: &Event)
     {
         match event {
-            Event::OutputPathChanged(path) => self.onPathChanged(path),
+            Event::OutputPathChanged(pathInfo)    => self.onPathChanged(pathInfo),
             Event::PartialOutputPathChanged(path) => self.onPartialPathChanged(path),
             _ => onUnknown(source, event)
         }
@@ -28,19 +29,23 @@ impl EventHandler for OutputPathLabel
 
 impl OutputPathLabel
 {
-    pub fn new(date: LocalDate, guiElementProvider: &GuiElementProvider) -> Self
+    pub fn new(config: &Config, date: LocalDate, guiElementProvider: &GuiElementProvider) -> Self
     {
         let widget = guiElementProvider.get::<gtk::Label>("outputPathLabel");
-        widget.set_text(&format!("<path>/{}/{:02}", date.year(), date.month()));
+        let prefixPath = match &config.outputPathPrefix {
+            Some(path) => path.to_string_lossy(),
+            None => "<path>".into()
+        };
+        widget.set_text(&format!("{}/{}/{:02}", prefixPath, date.year(), date.month()));
         Self{widget}
     }
 
 
     // private
 
-    fn onPathChanged(&self, path: &Path)
+    fn onPathChanged(&self, pathInfo: &OutputPathInfo)
     {
-        self.widget.set_text(&path.to_string_lossy());
+        self.widget.set_text(&pathInfo.full.to_string_lossy());
     }
 
     fn onPartialPathChanged(&self, path: &Path)

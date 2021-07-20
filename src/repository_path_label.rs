@@ -5,6 +5,7 @@ use crate::repository::Repository;
 use crate::source::Source;
 
 use gtk::prelude::LabelExt as _;
+use std::path::Path;
 use std::rc::Rc;
 
 
@@ -26,9 +27,13 @@ impl EventHandler for RepositoryPathLabel
 
 impl RepositoryPathLabel
 {
-    pub fn new(guiElementProvider: &GuiElementProvider) -> Self
+    pub fn new(path: Option<&Path>, guiElementProvider: &GuiElementProvider) -> Self
     {
-        Self{widget: guiElementProvider.get::<gtk::Label>("repositoryPathLabel")}
+        let widget = guiElementProvider.get::<gtk::Label>("repositoryPathLabel");
+        if let Some(path) = path {
+            widget.set_text(&path.to_string_lossy());
+        }
+        Self{widget}
     }
 
 

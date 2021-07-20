@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 #![allow(clippy::new_without_default)]
 
+pub mod config_path;
 pub mod gui;
 
 mod application_window;
@@ -16,6 +17,7 @@ mod commit_log_column;
 mod commit_log_model;
 mod commit_log_model_filter;
 mod commit_log_view;
+mod config_store;
 mod date_time;
 mod diff_colorizer;
 mod diff_formatter;

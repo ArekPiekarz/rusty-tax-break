@@ -33,7 +33,7 @@ impl EventHandler for CommitDiffView
 
 impl CommitDiffView
 {
-    pub fn new(guiElementProvider: &GuiElementProvider, sender: Sender) -> Self
+    pub fn new(repository: Option<Rc<Repository>>, guiElementProvider: &GuiElementProvider, sender: Sender) -> Self
     {
         let textView = TextView::new(guiElementProvider, "commitDiffView", sender, Source::CommitDiffViewWidget);
         let diffColorizer = DiffColorizer::new();
@@ -41,7 +41,7 @@ impl CommitDiffView
         Self{
             textView,
             diffColorizer,
-            repository: None
+            repository
         }
     }
 

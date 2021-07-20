@@ -15,8 +15,8 @@ fn cancelChoosingRepository()
 {
     let context = glib::MainContext::default();
     let _guard = context.acquire().unwrap();
-    setupTestWithoutRepo();
-    let gui = makeGui();
+    let testResources = setupTestWithoutRepo();
+    let gui = makeGui(testResources.getConfigFilePath());
     assertRepositoryPathLabelTextIsPlaceholder(&gui);
     assertCommitLogViewIsEmpty(&gui);
 

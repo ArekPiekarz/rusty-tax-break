@@ -15,9 +15,10 @@ fn chooseEmptyRepository()
 {
     let context = glib::MainContext::default();
     let _guard = context.acquire().unwrap();
-    let (_repoDirGuard, repoDir) = setupTest();
+    let testResources = setupTest();
+    let repoDir = testResources.getRepoDir();
     let repoDirStr = repoDir.to_str().unwrap();
-    let gui = makeGui();
+    let gui = makeGui(testResources.getConfigFilePath());
     assertRepositoryPathLabelTextIs("none", &gui);
     assertCommitLogViewIsEmpty(&gui);
 

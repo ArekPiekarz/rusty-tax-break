@@ -1,5 +1,6 @@
+use crate::config_store::Config;
 use crate::date_time::LocalDate;
-use crate::event::{Event, Year};
+use crate::event::{Event, OutputPathInfo, Year};
 use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::source::Source;
 
@@ -31,9 +32,24 @@ impl EventHandler for OutputPathStore
 
 impl OutputPathStore
 {
-    pub fn new(date: LocalDate, sender: Sender) -> Self
+    pub fn new(config: &Config, date: LocalDate, sender: Sender) -> Self
     {
-        Self{path: None, pathPrefix: None, date, sender}
+        match &config.outputPathPrefix {
+            Some(prefix) => {
+                let mut path = prefix.clone();
+                path.push(date.year().to_string());
+                path.push(format!("{:02}", date.month()));
+                Self{path: Some(path), pathPrefix: Some(prefix.into()), date, sender}
+            },
+            None => {
+                Self{path: None, pathPrefix: None, date, sender}
+            }
+        }
+    }
+
+    pub fn getPath(&self) -> &Option<PathBuf>
+    {
+        &self.path
     }
 
 
@@ -51,15 +67,21 @@ impl OutputPathStore
         self.updatePath();
     }
 
-    fn onMonthChanged(&mut self, month: chrono::Month)
+    fn onMonthChanged(&mut self, newMonth: chrono::Month)
     {
-        self.date = self.date.with_month(month.number_from_month()).unwrap();
+        if self.date.month() == newMonth.number_from_month() {
+            return;
+        }
+        self.date = self.date.with_month(newMonth.number_from_month()).unwrap();
         self.updatePath();
     }
 
-    fn onYearChanged(&mut self, year: Year)
+    fn onYearChanged(&mut self, newYear: Year)
     {
-        self.date = self.date.with_year(year).unwrap();
+        if self.date.year() == newYear {
+            return;
+        }
+        self.date = self.date.with_year(newYear).unwrap();
         self.updatePath();
     }
 
@@ -71,7 +93,9 @@ impl OutputPathStore
                 path.push(self.date.year().to_string());
                 path.push(format!("{:02}", self.date.month()));
                 self.path = Some(path.clone());
-                self.sender.send((Source::OutputPathStore, Event::OutputPathChanged(path))).unwrap();
+                self.sender.send(
+                    (Source::OutputPathStore,
+                     Event::OutputPathChanged(OutputPathInfo{full: path, prefix: pathPrefix.into()}))).unwrap();
             },
             None => {
                 let mut path = PathBuf::from(self.date.year().to_string());

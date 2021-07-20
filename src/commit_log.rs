@@ -29,9 +29,13 @@ impl EventHandler for CommitLog
 
 impl CommitLog
 {
-    pub fn new(sender: Sender) -> Self
+    pub fn new(repoOpt: &Option<Rc<Repository>>, sender: Sender) -> Self
     {
-        Self{commits: vec![], sender}
+        let mut newSelf = Self{commits: vec![], sender};
+        if let Some(repo) = repoOpt {
+            newSelf.loadCommits(repo);
+        }
+        newSelf
     }
 
     pub fn getCommits(&self) -> &[CommitInfo]
@@ -54,8 +58,13 @@ impl CommitLog
     fn onRepositoryChanged(&mut self, repo: &Rc<Repository>)
     {
         self.commits.clear();
+        self.loadCommits(repo);
+        self.sender.send((Source::CommitLog, Event::CommitLogChanged)).unwrap();
+    }
+
+    fn loadCommits(&mut self, repo: &Rc<Repository>)
+    {
         if repo.isEmpty() {
-            eprintln!("Cannot load commits, because repository is empty.");
             return;
         }
 
@@ -68,8 +77,6 @@ impl CommitLog
             let id = commit.id();
             self.commits.push(CommitInfo {id, summary, date, author, email, markedForReport: false});
         });
-
-        self.sender.send((Source::CommitLog, Event::CommitLogFilled)).unwrap();
     }
 }
 

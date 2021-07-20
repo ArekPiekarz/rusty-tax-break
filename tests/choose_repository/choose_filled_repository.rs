@@ -18,13 +18,14 @@ fn chooseFilledRepository()
 {
     let context = glib::MainContext::default();
     let _guard = context.acquire().unwrap();
-    let (_repoDirGuard, repoDir) = setupTest();
+    let testResources = setupTest();
+    let repoDir = testResources.getRepoDir();
     let repoDirStr = repoDir.to_str().unwrap();
     let filePath = PathBuf::from("some_file");
     makeNewStagedFile(&filePath, "some file content\n", &repoDir);
     makeCommit(COMMIT_MESSAGE, &repoDir);
     let commitDate = findLastCommitDateForLogView(&repoDir);
-    let gui = makeGui();
+    let gui = makeGui(testResources.getConfigFilePath());
     assertRepositoryPathLabelTextIs("none", &gui);
     assertCommitLogViewIsEmpty(&gui);
 
