@@ -40,6 +40,7 @@ pub fn setupDispatching(handlers: EventHandlers, receiver: Receiver)
     use Source as S;
     use Event as E;
     attach(receiver, move |(source, event)| { match (source, &event) {
+        (S::ApplicationWindow,                  E::WindowMaximized(_))               => configStore.handle(source, &event),
         (S::ChooseOutputFolderButtonWidget,     E::Clicked)                          => chooseOutputFolderButton.handle(source, &event),
         (S::ChooseOutputFolderButton,           E::FolderChosen(_))                  => outputPathStore.handle(source, &event),
         (S::ChooseOutputFolderDialog,           E::DialogResponded(_))               => chooseOutputFolderButton.handle(source, &event),

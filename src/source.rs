@@ -1,6 +1,7 @@
 #[derive(Clone, Copy, Debug)]
 pub enum Source
 {
+    ApplicationWindow,
     ChooseOutputFolderButton,
     ChooseOutputFolderButtonWidget,
     ChooseOutputFolderDialog,

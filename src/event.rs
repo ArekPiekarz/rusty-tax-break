@@ -24,6 +24,7 @@ pub enum Event
     PartialOutputPathChanged(PathBuf),
     RepositoryChanged(Rc<Repository>),
     SelectionChanged(gtk::TreeSelection),
+    WindowMaximized(bool),
     YearFilterChanged(Year),
     ZoomRequested(gdk::EventScroll)
 }

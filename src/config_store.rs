@@ -23,6 +23,7 @@ impl EventHandler for ConfigStore
         match event {
             Event::OutputPathChanged(pathInfo) => self.onOutputPathChanged(pathInfo),
             Event::RepositoryChanged(repo)     => self.onRepositoryChanged(repo),
+            Event::WindowMaximized(isMaximized) => self.onWindowMaximized(*isMaximized),
             _ => onUnknown(source, event)
         }
     }
@@ -34,7 +35,7 @@ impl ConfigStore
     {
         let dirPath = configPath.getDirPath();
         let filePath = configPath.getFilePath();
-        let config = toml::from_str(&std::fs::read_to_string(filePath).unwrap_or_default()).unwrap();
+        let config = toml::from_str(&std::fs::read_to_string(filePath).unwrap_or_default()).unwrap_or_default();
         Self{config, dirPath: dirPath.into(), filePath: filePath.into()}
     }
 
@@ -61,6 +62,16 @@ impl ConfigStore
         self.saveToFile();
     }
 
+    fn onWindowMaximized(&mut self, isMaximized: bool)
+    {
+        if self.config.isWindowMaximized == isMaximized {
+            return;
+        }
+
+        self.config.isWindowMaximized = isMaximized;
+        self.saveToFile();
+    }
+
     fn saveToFile(&self)
     {
         std::fs::create_dir_all(&self.dirPath).unwrap();
@@ -68,9 +79,10 @@ impl ConfigStore
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Default, Deserialize, Serialize)]
 pub struct Config
 {
+    pub isWindowMaximized: bool,
     pub repository: Option<PathBuf>,
     pub outputPathPrefix: Option<PathBuf>
 }

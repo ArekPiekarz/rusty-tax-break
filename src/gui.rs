@@ -44,7 +44,7 @@ impl Gui
         let config = configStore.getConfig();
         let currentDate = chrono::Local::today();
         let outputFileNamesPattern = "<commit_short_id> <commit_summary>";
-        let applicationWindow = ApplicationWindow::new(&guiElementProvider);
+        let applicationWindow = ApplicationWindow::new(config, &guiElementProvider, sender.clone());
         let chooseOutputFolderButton = makeChooseOutputFolderButton(&guiElementProvider, sender.clone());
         let chooseRepositoryFolderButton = makeChooseRepositoryFolderButton(&guiElementProvider, sender.clone());
         let optionsDialog = OptionsDialog::new(outputFileNamesPattern, sender.clone());
