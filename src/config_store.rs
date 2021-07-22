@@ -1,5 +1,5 @@
 use crate::config_path::ConfigPath;
-use crate::event::{Event, OutputPathInfo};
+use crate::event::{CommitAuthorFilter, Event, OutputPathInfo};
 use crate::event_handling::{EventHandler, onUnknown};
 use crate::source::Source;
 use crate::repository::Repository;
@@ -21,9 +21,10 @@ impl EventHandler for ConfigStore
     fn handle(&mut self, source: Source, event: &Event)
     {
         match event {
-            Event::OutputPathChanged(pathInfo) => self.onOutputPathChanged(pathInfo),
-            Event::RepositoryChanged(repo)     => self.onRepositoryChanged(repo),
-            Event::WindowMaximized(isMaximized) => self.onWindowMaximized(*isMaximized),
+            Event::CommitAuthorFilterChanged(filter) => self.onCommitAuthorFilterChanged(filter),
+            Event::OutputPathChanged(pathInfo)       => self.onOutputPathChanged(pathInfo),
+            Event::RepositoryChanged(repo)           => self.onRepositoryChanged(repo),
+            Event::WindowMaximized(isMaximized)      => self.onWindowMaximized(*isMaximized),
             _ => onUnknown(source, event)
         }
     }
@@ -44,6 +45,15 @@ impl ConfigStore
         &self.config
     }
 
+    fn onCommitAuthorFilterChanged(&mut self, filter: &CommitAuthorFilter)
+    {
+        if self.config.commitAuthorFilter == *filter {
+            return;
+        }
+        self.config.commitAuthorFilter = filter.clone();
+        self.saveToFile();
+    }
+
     fn onOutputPathChanged(&mut self, pathInfo: &OutputPathInfo)
     {
         if let Some(prefix) = &self.config.outputPathPrefix {
@@ -58,6 +68,11 @@ impl ConfigStore
 
     fn onRepositoryChanged(&mut self, repo: &Rc<Repository>)
     {
+        if let Some(repoPath) = &self.config.repository {
+            if repoPath == repo.getPath() {
+                return;
+            }
+        }
         self.config.repository = Some(repo.getPath().into());
         self.saveToFile();
     }
@@ -82,7 +97,8 @@ impl ConfigStore
 #[derive(Default, Deserialize, Serialize)]
 pub struct Config
 {
+    pub commitAuthorFilter: CommitAuthorFilter,
     pub isWindowMaximized: bool,
-    pub repository: Option<PathBuf>,
-    pub outputPathPrefix: Option<PathBuf>
+    pub outputPathPrefix: Option<PathBuf>,
+    pub repository: Option<PathBuf>
 }

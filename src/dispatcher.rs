@@ -26,7 +26,7 @@ pub fn setupDispatching(handlers: EventHandlers, receiver: Receiver)
     let mut chooseRepositoryFolderButton = handlers.chooseRepositoryFolderButton;
     let mut commitDiffView = handlers.commitDiffView;
     let mut commitLog = handlers.commitLog;
-    let mut commitLogModelFilter = handlers.commitLogFilterModel;
+    let mut commitLogModelFilter = handlers.commitLogModelFilter;
     let mut commitLogModel = handlers.commitLogModel;
     let mut commitLogView = handlers.commitLogView;
     let mut configStore = handlers.configStore;
@@ -48,7 +48,7 @@ pub fn setupDispatching(handlers: EventHandlers, receiver: Receiver)
         (S::ChooseRepositoryFolderButtonWidget, E::Clicked)                          => chooseRepositoryFolderButton.handle(source, &event),
         (S::ChooseRepositoryFolderDialog,       E::DialogResponded(_))               => chooseRepositoryFolderButton.handle(source, &event),
         (S::CommitDiffViewWidget,               E::ZoomRequested(_))                 => commitDiffView.handle(source, &event),
-        (S::CommitAuthorFilterEntry,            E::CommitAuthorFilterChanged(_))     => commitLogModelFilter.handle(source, &event),
+        (S::CommitAuthorFilterEntry,            E::CommitAuthorFilterChanged(_))     => (&mut commitLogModelFilter, &mut configStore).handle(source, &event),
         (S::CommitLog,                          E::CommitLogChanged)                 => commitLogModel.handle(source, &event),
         (S::CommitLogModelFilter,               E::MarkCommitForReportToggled(_))    => commitLogModel.handle(source, &event),
         (S::CommitLogView,                      E::CommitSelected(_))                => commitDiffView.handle(source, &event),
@@ -76,7 +76,7 @@ pub struct EventHandlers
     pub chooseRepositoryFolderButton: ChooseFolderButton,
     pub commitDiffView: CommitDiffView,
     pub commitLog: Rc<RefCell<CommitLog>>,
-    pub commitLogFilterModel: CommitLogModelFilter,
+    pub commitLogModelFilter: CommitLogModelFilter,
     pub commitLogModel: CommitLogModel,
     pub commitLogView: CommitLogView,
     pub configStore: ConfigStore,

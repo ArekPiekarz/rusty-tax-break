@@ -1,5 +1,6 @@
 use crate::commit_log::CommitLog;
 use crate::commit_log_column::{CommitLogColumn, OriginalRow};
+use crate::config_store::Config;
 use crate::event::{CommitAuthorFilterStr, Event, Year};
 use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::gui_element_provider::GuiElementProvider;
@@ -42,10 +43,15 @@ impl EventHandler for CommitLogModelFilter
 
 impl CommitLogModelFilter
 {
-    pub fn new(commitLog: Rc<RefCell<CommitLog>>, guiElementProvider: &GuiElementProvider, sender: Sender) -> Self
+    pub fn new(
+        config: &Config,
+        commitLog: Rc<RefCell<CommitLog>>,
+        guiElementProvider: &GuiElementProvider,
+        sender: Sender)
+        -> Self
     {
         let modelFilter = guiElementProvider.get::<gtk::TreeModelFilter>("commitLogStoreFilter");
-        let authorFilter = Rc::new(RefCell::new("".into()));
+        let authorFilter = Rc::new(RefCell::new(config.commitAuthorFilter.clone()));
         let monthFilter = Rc::new(RefCell::new(chrono::Month::January));
         let yearFilter = Rc::new(RefCell::new(1));
         setupFilterFunction(

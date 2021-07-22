@@ -54,7 +54,8 @@ impl Gui
         let repository = repositoryStore.getRepository();
         let repositoryPathLabel = RepositoryPathLabel::new(repositoryStore.getRepositoryPath(), &guiElementProvider);
         let commitLog = Rc::new(RefCell::new(CommitLog::new(repository, sender.clone())));
-        let commitLogFilterModel = CommitLogModelFilter::new(Rc::clone(&commitLog), &guiElementProvider, sender.clone());
+        let commitLogModelFilter = CommitLogModelFilter::new(
+            config, Rc::clone(&commitLog), &guiElementProvider, sender.clone());
         let commitLogModel = CommitLogModel::new(Rc::clone(&commitLog), &guiElementProvider);
         let commitLogView = CommitLogView::new(Rc::clone(&commitLog), &guiElementProvider, sender.clone());
         let commitDiffView = CommitDiffView::new(repository.clone(), &guiElementProvider, sender.clone());
@@ -62,7 +63,7 @@ impl Gui
             Rc::clone(&commitLog), repository.clone(),  outputPathStore.getPath().clone(), outputFileNamesPattern);
         setupOpenOptionsButton(&guiElementProvider, sender.clone());
         setupGenerateReportButton(&guiElementProvider, sender.clone());
-        setupCommitAuthorFilterEntry(&guiElementProvider, sender.clone());
+        setupCommitAuthorFilterEntry(config, &guiElementProvider, sender.clone());
         setupMonthFilterComboBox(&currentDate, &guiElementProvider, sender.clone());
         setupYearFilterSpinButton(&currentDate, &guiElementProvider, sender);
 
@@ -71,7 +72,7 @@ impl Gui
             chooseRepositoryFolderButton,
             commitDiffView,
             commitLog,
-            commitLogFilterModel,
+            commitLogModelFilter,
             commitLogModel,
             commitLogView,
             configStore,
