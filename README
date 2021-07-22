@@ -1,0 +1,9 @@
+Rusty Tax Break
+GUI application for generating tax break reports.
+
+Building:
+./build-release.sh
+
+Running:
+target/release/rusty-tax-break
+
