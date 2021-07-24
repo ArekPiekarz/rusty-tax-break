@@ -268,7 +268,8 @@
           </packing>
         </child>
         <child>
-          <object class="GtkPaned">
+          <object class="GtkPaned" id="paneWithCommitLogAndDiff">
+            <property name="name">paneWithCommitLogAndDiff</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="orientation">vertical</property>

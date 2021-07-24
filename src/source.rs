@@ -21,6 +21,7 @@ pub enum Source
     OptionsDialog,
     OptionsDialogWidget,
     OutputPathStore,
+    PaneWithCommitLogAndDiff,
     RepositoryStore,
     YearSpinButton
 }

@@ -62,6 +62,7 @@ pub fn setupDispatching(handlers: EventHandlers, receiver: Receiver)
         (S::OptionsDialogWidget,                E::DialogResponded(_))               => optionsDialog.handle(source, &event),
         (S::OutputPathStore,                    E::OutputPathChanged(_))             => (&mut outputPathLabel, &mut reportGenerator, &mut configStore).handle(source, &event),
         (S::OutputPathStore,                    E::PartialOutputPathChanged(_))      => outputPathLabel.handle(source, &event),
+        (S::PaneWithCommitLogAndDiff,           E::PanePositionChanged(_))           => configStore.handle(source, &event),
         (S::RepositoryStore,                    E::RepositoryChanged(_))             => (&mut repositoryPathLabel, &mut commitLog, &mut commitDiffView, &mut reportGenerator, &mut configStore).handle(source, &event),
         (S::YearSpinButton,                     E::YearFilterChanged(_))             => (&mut commitLogModelFilter, &mut outputPathStore).handle(source, &event),
         (source, event) => onUnknown(source, &event) }

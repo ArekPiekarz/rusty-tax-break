@@ -1,8 +1,9 @@
 use crate::config_path::ConfigPath;
 use crate::event::{CommitAuthorFilter, Event, OutputPathInfo};
 use crate::event_handling::{EventHandler, onUnknown};
-use crate::source::Source;
+use crate::pane_with_commit_log_and_diff::PanePosition;
 use crate::repository::Repository;
+use crate::source::Source;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -23,6 +24,7 @@ impl EventHandler for ConfigStore
         match event {
             Event::CommitAuthorFilterChanged(filter) => self.onCommitAuthorFilterChanged(filter),
             Event::OutputPathChanged(pathInfo)       => self.onOutputPathChanged(pathInfo),
+            Event::PanePositionChanged(position)     => self.onPanePositionChanged(*position),
             Event::RepositoryChanged(repo)           => self.onRepositoryChanged(repo),
             Event::WindowMaximized(isMaximized)      => self.onWindowMaximized(*isMaximized),
             _ => onUnknown(source, event)
@@ -36,7 +38,7 @@ impl ConfigStore
     {
         let dirPath = configPath.getDirPath();
         let filePath = configPath.getFilePath();
-        let config = toml::from_str(&std::fs::read_to_string(filePath).unwrap_or_default()).unwrap_or_default();
+        let config = toml::from_str(&std::fs::read_to_string(filePath).unwrap_or_default()).unwrap();
         Self{config, dirPath: dirPath.into(), filePath: filePath.into()}
     }
 
@@ -63,6 +65,15 @@ impl ConfigStore
         }
 
         self.config.outputPathPrefix = Some(pathInfo.prefix.clone());
+        self.saveToFile();
+    }
+
+    fn onPanePositionChanged(&mut self, position: PanePosition)
+    {
+        if self.config.positionOfPaneWithCommitLogAndDiff == position {
+            return;
+        }
+        self.config.positionOfPaneWithCommitLogAndDiff = position;
         self.saveToFile();
     }
 
@@ -94,11 +105,22 @@ impl ConfigStore
     }
 }
 
-#[derive(Default, Deserialize, Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Config
 {
+    #[serde(default)]
     pub commitAuthorFilter: CommitAuthorFilter,
+    #[serde(default)]
     pub isWindowMaximized: bool,
+    #[serde(default)]
     pub outputPathPrefix: Option<PathBuf>,
+    #[serde(default = "defaultPositionOfPaneWithCommitLogAndDiff")]
+    pub positionOfPaneWithCommitLogAndDiff: PanePosition,
+    #[serde(default)]
     pub repository: Option<PathBuf>
+}
+
+fn defaultPositionOfPaneWithCommitLogAndDiff() -> PanePosition
+{
+    75
 }

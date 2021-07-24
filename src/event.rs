@@ -1,3 +1,4 @@
+use crate::pane_with_commit_log_and_diff::PanePosition;
 use crate::repository::Repository;
 
 use gtk::gdk;
@@ -22,6 +23,7 @@ pub enum Event
     OutputFileNamesPatternChanged(String),
     OutputPathChanged(OutputPathInfo),
     PartialOutputPathChanged(PathBuf),
+    PanePositionChanged(PanePosition),
     RepositoryChanged(Rc<Repository>),
     SelectionChanged(gtk::TreeSelection),
     WindowMaximized(bool),

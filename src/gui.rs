@@ -18,6 +18,7 @@ use crate::open_options_button::setupOpenOptionsButton;
 use crate::options_dialog::OptionsDialog;
 use crate::output_path_label::OutputPathLabel;
 use crate::output_path_store::OutputPathStore;
+use crate::pane_with_commit_log_and_diff::setupPaneWithCommitLogAndCommitDiff;
 use crate::report_generator::ReportGenerator;
 use crate::repository_path_label::RepositoryPathLabel;
 use crate::repository_store::RepositoryStore;
@@ -65,7 +66,8 @@ impl Gui
         setupGenerateReportButton(&guiElementProvider, sender.clone());
         setupCommitAuthorFilterEntry(config, &guiElementProvider, sender.clone());
         setupMonthFilterComboBox(&currentDate, &guiElementProvider, sender.clone());
-        setupYearFilterSpinButton(&currentDate, &guiElementProvider, sender);
+        setupYearFilterSpinButton(&currentDate, &guiElementProvider, sender.clone());
+        setupPaneWithCommitLogAndCommitDiff(config, &guiElementProvider, sender);
 
         let eventHandlers = EventHandlers {
             chooseOutputFolderButton,

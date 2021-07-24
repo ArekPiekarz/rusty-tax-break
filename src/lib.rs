@@ -32,6 +32,7 @@ mod open_options_button;
 mod options_dialog;
 mod output_path_label;
 mod output_path_store;
+mod pane_with_commit_log_and_diff;
 mod report_generator;
 mod repository;
 mod repository_path_label;
