@@ -5,7 +5,6 @@ use crate::common::gui_assertions::{assertCommitLogViewIsEmpty, assertRepository
 use crate::common::gui_interactions::{cancelDialog, clickChooseRepositoryFolderButton};
 use crate::common::test_setup::{makeGui, setupTestWithoutRepo};
 
-use gtk::glib;
 use rusty_fork::rusty_fork_test;
 
 
@@ -13,8 +12,6 @@ rusty_fork_test! {
 #[test]
 fn cancelChoosingRepository()
 {
-    let context = glib::MainContext::default();
-    let _guard = context.acquire().unwrap();
     let testResources = setupTestWithoutRepo();
     let gui = makeGui(testResources.getConfigFilePath());
     assertRepositoryPathLabelTextIsPlaceholder(&gui);

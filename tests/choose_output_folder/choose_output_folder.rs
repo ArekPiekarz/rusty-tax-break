@@ -6,7 +6,6 @@ use crate::common::gui_assertions::{
 use crate::common::gui_interactions::{acceptDialog, clickChooseOutputFolderButton, setCurrentFolderInDialog};
 use crate::common::test_setup::{getCurrentDate, makeGui, makeTemporaryDir, setupTestWithoutRepo};
 
-use gtk::glib;
 use rusty_fork::rusty_fork_test;
 
 
@@ -14,8 +13,6 @@ rusty_fork_test! {
 #[test]
 fn chooseOutputFolder()
 {
-    let context = glib::MainContext::default();
-    let _guard = context.acquire().unwrap();
     let testResources = setupTestWithoutRepo();
     let (_outputPathPrefixGuard, outputPathPrefix) = makeTemporaryDir();
     let gui = makeGui(testResources.getConfigFilePath());
