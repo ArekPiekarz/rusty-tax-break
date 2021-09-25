@@ -1,11 +1,14 @@
 use crate::commit_diff::{makeCommitSummary, makeFormattedDiff};
 use crate::commit_log::{CommitLog, CommitInfo};
+use crate::date_time::{LocalDateTime, ZERO_NANOSECONDS};
 use crate::event::{Event, OutputPathInfo};
 use crate::event_handling::{EventHandler, onUnknown};
 use crate::repository::Repository;
 use crate::source::Source;
 
+use chrono::{Datelike as _, Timelike as _, TimeZone as _};
 use std::cell::RefCell;
+use std::convert::TryInto as _;
 use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::Write as _;
@@ -97,6 +100,7 @@ impl ReportGenerator
         let commitId = commitInfo.id;
         let commit = repo.findCommit(commitId).unwrap();
         let commitsDiff = repo.makeDiffOfCommitAndParent(&commit);
+        let commitDateTime = toZipDateTime(&chrono::Local.timestamp(commit.time().seconds(), ZERO_NANOSECONDS));
 
         let zipFileNameStem = self.formatFileName(commitInfo, repo);
         let fullFilesZipPath = makeFullFilesZipPath(outputPath, &zipFileNameStem);
@@ -107,7 +111,9 @@ impl ReportGenerator
         let diffAndFullFilesZipFile = OpenOptions::new().write(true).create_new(true).open(diffAndFullFilesZipPath).unwrap();
         let mut diffAndFullFilesZipWriter = ZipWriter::new(diffAndFullFilesZipFile);
 
-        let zipOptions = ZipFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+        let zipOptions = ZipFileOptions::default()
+            .compression_method(zip::CompressionMethod::Deflated)
+            .last_modified_time(commitDateTime);
 
         reportDiffFile(&commit, &commitsDiff, &mut diffAndFullFilesZipWriter, &zipOptions);
         reportFullFiles(&commitsDiff, repo, &mut fullFilesZipWriter, &mut diffAndFullFilesZipWriter, &zipOptions);
@@ -187,4 +193,16 @@ fn reportFullFiles(
         diffAndFullFilesZipWriter.start_file(diffAndFullFilesFilePath.to_str().unwrap(), *zipOptions).unwrap();
         diffAndFullFilesZipWriter.write_all(fileContent).unwrap();
     }
+}
+
+fn toZipDateTime(dateTime: &LocalDateTime) -> zip::DateTime
+{
+    zip::DateTime::from_date_and_time(
+        dateTime.year().try_into().unwrap(),
+        dateTime.month().try_into().unwrap(),
+        dateTime.day().try_into().unwrap(),
+        dateTime.hour().try_into().unwrap(),
+        dateTime.minute().try_into().unwrap(),
+        dateTime.second().try_into().unwrap())
+        .unwrap()
 }
