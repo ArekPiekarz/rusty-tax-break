@@ -11,7 +11,6 @@ use gtk::glib;
 use gtk::prelude::TreeModelExt as _;
 use gtk::prelude::TreeModelFilterExt as _;
 use std::cell::RefCell;
-use std::convert::TryInto as _;
 use std::rc::Rc;
 
 pub struct CommitLogModelFilter

@@ -10,7 +10,6 @@ use crate::tree_view_column_config::{ColumnRenderer, TreeViewColumnConfig};
 use gtk::prelude::TreeSelectionExt as _;
 use gtk::prelude::TreeModelExt as _;
 use std::cell::RefCell;
-use std::convert::TryInto as _;
 use std::rc::Rc;
 
 

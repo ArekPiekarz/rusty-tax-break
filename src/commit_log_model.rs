@@ -9,7 +9,6 @@ use gtk::prelude::GtkListStoreExt as _;
 use gtk::prelude::GtkListStoreExtManual as _;
 use gtk::prelude::TreeModelExt as _;
 use std::cell::RefCell;
-use std::convert::TryInto as _;
 use std::rc::Rc;
 use to_trait::To as _;
 

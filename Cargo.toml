@@ -2,7 +2,7 @@
 name = "rusty-tax-break"
 version = "0.1.0"
 authors = ["Arkadiusz Piekarz <piekarzarkadiusz@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 chrono = { version = "0.4.19", default-features = false, features = ["clock"] }

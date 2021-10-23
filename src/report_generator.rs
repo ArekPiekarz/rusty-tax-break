@@ -8,7 +8,6 @@ use crate::source::Source;
 
 use chrono::{Datelike as _, Timelike as _, TimeZone as _};
 use std::cell::RefCell;
-use std::convert::TryInto as _;
 use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::Write as _;
