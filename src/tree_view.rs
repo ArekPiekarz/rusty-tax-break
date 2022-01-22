@@ -4,7 +4,6 @@ use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 use crate::tree_view_column_config::{ColumnRenderer, ToggledAction, TreeViewColumnConfig};
 
-use gtk::prelude::CellLayoutExt as _;
 use gtk::prelude::CellRendererToggleExt as _;
 use gtk::prelude::TreeSelectionExt as _;
 use gtk::prelude::TreeViewColumnExt as _;
