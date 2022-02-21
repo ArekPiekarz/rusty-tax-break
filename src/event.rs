@@ -4,6 +4,7 @@ use crate::repository::Repository;
 use gtk::gdk;
 use std::path::PathBuf;
 use std::rc::Rc;
+use time::Month;
 
 
 #[derive(Debug)]
@@ -18,7 +19,7 @@ pub enum Event
     FolderChosen(PathBuf),
     GenerateReportRequested,
     MarkCommitForReportToggled(gtk::TreePath),
-    MonthFilterChanged(chrono::Month),
+    MonthFilterChanged(Month),
     OpenOptionsRequested,
     OutputFileNamesPatternChanged(String),
     OutputPathChanged(OutputPathInfo),

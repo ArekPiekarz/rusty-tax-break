@@ -10,6 +10,7 @@ use crate::commit_log_model_filter::CommitLogModelFilter;
 use crate::commit_log_view::CommitLogView;
 use crate::config_path::ConfigPath;
 use crate::config_store::ConfigStore;
+use crate::date_time::getCurrentDate;
 use crate::dispatcher::{EventHandlers, setupDispatching};
 use crate::generate_report_button::setupGenerateReportButton;
 use crate::gui_element_provider::GuiElementProvider;
@@ -43,7 +44,7 @@ impl Gui
 
         let configStore = ConfigStore::new(configPath);
         let config = configStore.getConfig();
-        let currentDate = chrono::Local::today();
+        let currentDate = getCurrentDate();
         let outputFileNamesPattern = "<commit_short_id> <commit_summary>";
         let applicationWindow = ApplicationWindow::new(config, &guiElementProvider, sender.clone());
         let chooseOutputFolderButton = makeChooseOutputFolderButton(&guiElementProvider, sender.clone());

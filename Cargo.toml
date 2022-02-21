@@ -5,15 +5,15 @@ authors = ["Arkadiusz Piekarz <piekarzarkadiusz@gmail.com>"]
 edition = "2021"
 
 [dependencies]
-chrono = { version = "0.4.19", default-features = false, features = ["clock"] }
 dirs = { version = "4.0.0", default-features = false }
 git2 = { version = "0.13.25", default-features = false }
 gtk = { version = "0.15.4", default-features = false, features = ["v3_20"] }
-num-traits = { version = "0.2.14", default-features = false }
 sanitize-filename = {version = "0.3.0", default-features = false }
 serde = { version ="1.0.136", default-features = false, features = ["derive"] }
+time = { version = "0.3.7", default-features = false, features = ["formatting", "macros"] }
 to_trait = { version = "0.1.1", default-features = false }
 toml = { version = "0.5.8", default-features = false }
+tz-rs = { version = "0.5.3", default-features = false }
 zip = { version = "0.5.13", default-features = false, features = ["deflate"] }
 
 [dev-dependencies]
@@ -22,6 +22,7 @@ gtk-test = {version = "0.15.0", default-features = false }
 rusty-fork = { version = "0.3.0", default-features = false }
 tempfile = { version = "3.3.0", default-features = false }
 termcolor = { version = "1.1.2", default-features = false }
+time = { version = "0.3.7", default-features = false, features = ["formatting", "macros", "parsing"] }
 
 [profile.release]
 codegen-units = 1

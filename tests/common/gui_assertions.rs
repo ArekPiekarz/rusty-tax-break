@@ -1,12 +1,11 @@
-use crate::common::date_time::LocalDate;
 use crate::common::gui_access::{findCommitLogView, findOutputPathLabel, findRepositoryPathLabel};
 use crate::common::test_gui::TestGui;
 
-use chrono::Datelike as _;
 use gtk::prelude::LabelExt as _;
 use gtk::prelude::TreeModelExt as _;
 use gtk::prelude::TreeViewExt as _;
 use std::path::Path;
+use time::Date;
 
 const CONTINUE_ITERATING_MODEL: bool = false;
 
@@ -62,12 +61,12 @@ pub fn assertOutputPathLabelTextIs(expectedText: &str, gui: &TestGui)
     assert_eq!(label.text().as_str(), expectedText, "\nActual output path label text differs from expected");
 }
 
-pub fn assertOutputPathLabelTextIsPlaceholder(date: &LocalDate, gui: &TestGui)
+pub fn assertOutputPathLabelTextIsPlaceholder(date: &Date, gui: &TestGui)
 {
     assertOutputPathLabelTextIs(&makePlaceholderOutputPathLabelText(date), &gui);
 }
 
-pub fn makeOutputPathLabelText(outputPathPrefix: &Path, date: &LocalDate) -> String
+pub fn makeOutputPathLabelText(outputPathPrefix: &Path, date: &Date) -> String
 {
     format!("{}/{}/{:02}", outputPathPrefix.to_string_lossy(), date.year(), date.month())
 }
@@ -143,7 +142,7 @@ impl From<CommitLogColumn> for i32
     }
 }
 
-fn makePlaceholderOutputPathLabelText(date: &LocalDate) -> String
+fn makePlaceholderOutputPathLabelText(date: &Date) -> String
 {
     format!("<path>/{}/{:02}", date.year(), date.month())
 }

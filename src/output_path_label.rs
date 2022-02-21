@@ -1,13 +1,12 @@
 use crate::config_store::Config;
-use crate::date_time::LocalDate;
 use crate::event::{Event, OutputPathInfo};
 use crate::event_handling::{EventHandler, onUnknown};
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
-use chrono::Datelike as _;
 use gtk::prelude::LabelExt as _;
 use std::path::Path;
+use time::Date;
 
 
 pub struct OutputPathLabel
@@ -29,7 +28,7 @@ impl EventHandler for OutputPathLabel
 
 impl OutputPathLabel
 {
-    pub fn new(config: &Config, date: LocalDate, guiElementProvider: &GuiElementProvider) -> Self
+    pub fn new(config: &Config, date: Date, guiElementProvider: &GuiElementProvider) -> Self
     {
         let widget = guiElementProvider.get::<gtk::Label>("outputPathLabel");
         let prefixPath = match &config.outputPathPrefix {

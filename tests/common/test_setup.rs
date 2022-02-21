@@ -1,4 +1,3 @@
-use crate::common::date_time::LocalDate;
 use crate::common::test_gui::TestGui;
 use crate::common::test_resources::TestResources;
 
@@ -40,11 +39,6 @@ pub fn makeTemporaryDir() -> (TempDir, PathBuf)
     let tempDir = tempdir().unwrap_or_else(|e| panic!("Failed to create temporary directory: {}", e));
     let path = tempDir.path().into();
     (tempDir, path)
-}
-
-pub fn getCurrentDate() -> LocalDate
-{
-    chrono::Local::today()
 }
 
 pub fn makeGui(configPath: &Path) -> TestGui

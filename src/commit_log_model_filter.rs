@@ -6,12 +6,13 @@ use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
-use chrono::Datelike as _;
 use gtk::glib;
 use gtk::prelude::TreeModelExt as _;
 use gtk::prelude::TreeModelFilterExt as _;
 use std::cell::RefCell;
 use std::rc::Rc;
+use time::Month;
+
 
 pub struct CommitLogModelFilter
 {
@@ -23,7 +24,7 @@ pub struct CommitLogModelFilter
 }
 
 type AuthorFilter = Rc<RefCell<String>>;
-type MonthFilter = Rc<RefCell<chrono::Month>>;
+type MonthFilter = Rc<RefCell<Month>>;
 type YearFilter = Rc<RefCell<Year>>;
 
 impl EventHandler for CommitLogModelFilter
@@ -51,7 +52,7 @@ impl CommitLogModelFilter
     {
         let modelFilter = guiElementProvider.get::<gtk::TreeModelFilter>("commitLogStoreFilter");
         let authorFilter = Rc::new(RefCell::new(config.commitAuthorFilter.clone()));
-        let monthFilter = Rc::new(RefCell::new(chrono::Month::January));
+        let monthFilter = Rc::new(RefCell::new(Month::January));
         let yearFilter = Rc::new(RefCell::new(1));
         setupFilterFunction(
             commitLog, &modelFilter, Rc::clone(&authorFilter), Rc::clone(&monthFilter), Rc::clone(&yearFilter));
@@ -67,7 +68,7 @@ impl CommitLogModelFilter
         self.modelFilter.refilter();
     }
 
-    fn onMonthChanged(&self, month: chrono::Month)
+    fn onMonthChanged(&self, month: Month)
     {
         *self.monthFilter.borrow_mut() = month;
         self.modelFilter.refilter();
@@ -104,7 +105,7 @@ fn setupFilterFunction(
         if date.year() != *yearFilter.borrow() {
             return false;
         }
-        if date.month() != monthFilter.borrow().number_from_month() {
+        if date.month() != *monthFilter.borrow() {
             return false;
         }
 

@@ -1,16 +1,15 @@
-use crate::date_time::LocalDate;
 use crate::event::Event;
 use crate::event_handling::Sender;
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
-use chrono::Datelike as _;
 use gtk::EditableSignals as _;
 use gtk::prelude::EntryExt as _;
 use gtk::prelude::SpinButtonExt as _;
+use time::Date;
 
 
-pub fn setupYearFilterSpinButton(date: &LocalDate, guiElementProvider: &GuiElementProvider, sender: Sender)
+pub fn setupYearFilterSpinButton(date: &Date, guiElementProvider: &GuiElementProvider, sender: Sender)
 {
     let yearFilterSpinButton = guiElementProvider.get::<gtk::SpinButton>("yearFilterSpinButton");
     let sender2 = sender.clone();

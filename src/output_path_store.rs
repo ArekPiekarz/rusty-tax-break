@@ -1,19 +1,18 @@
 use crate::config_store::Config;
-use crate::date_time::LocalDate;
 use crate::event::{Event, OutputPathInfo, Year};
 use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::source::Source;
 
-use chrono::Datelike as _;
 use std::path::Path;
 use std::path::PathBuf;
+use time::{Date, Month};
 
 
 pub struct OutputPathStore
 {
     path: Option<PathBuf>,
     pathPrefix: Option<PathBuf>,
-    date: LocalDate,
+    date: Date,
     sender: Sender
 }
 
@@ -32,7 +31,7 @@ impl EventHandler for OutputPathStore
 
 impl OutputPathStore
 {
-    pub fn new(config: &Config, date: LocalDate, sender: Sender) -> Self
+    pub fn new(config: &Config, date: Date, sender: Sender) -> Self
     {
         match &config.outputPathPrefix {
             Some(prefix) => {
@@ -67,12 +66,12 @@ impl OutputPathStore
         self.updatePath();
     }
 
-    fn onMonthChanged(&mut self, newMonth: chrono::Month)
+    fn onMonthChanged(&mut self, newMonth: Month)
     {
-        if self.date.month() == newMonth.number_from_month() {
+        if self.date.month() == newMonth {
             return;
         }
-        self.date = self.date.with_month(newMonth.number_from_month()).unwrap();
+        self.date = Date::from_calendar_date(self.date.year(), newMonth, self.date.day()).unwrap();
         self.updatePath();
     }
 
@@ -81,7 +80,7 @@ impl OutputPathStore
         if self.date.year() == newYear {
             return;
         }
-        self.date = self.date.with_year(newYear).unwrap();
+        self.date = Date::from_calendar_date(newYear, self.date.month(), self.date.day()).unwrap();
         self.updatePath();
     }
 

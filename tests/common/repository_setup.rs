@@ -4,8 +4,14 @@ use std::io::Write as _;
 use std::path::Path;
 use std::process::Command;
 use std::process::Stdio;
+use time::{
+    format_description::FormatItem,
+    format_description::well_known::Rfc2822,
+    macros::format_description,
+    OffsetDateTime};
 
-type LocalDateTime = chrono::DateTime<chrono::Local>;
+const DATE_TIME_FORMAT: &[FormatItem] =
+    format_description!("[day padding:space] [month repr:short] [year] [hour padding:space]:[minute]:[second]");
 
 
 pub fn makeNewStagedFile(filePath: &Path, content: &str, repositoryDir: &Path)
@@ -24,8 +30,7 @@ pub fn makeCommit(message: &str, repositoryDir: &Path)
 
 pub fn findLastCommitDateForLogView(repoDir: &Path) -> String
 {
-    // for date formatting below, see https://docs.rs/chrono/0.4.19/chrono/format/strftime/index.html
-    findLastCommitDate(repoDir).format("%_d %b %Y %_H:%M:%S").to_string()
+    findLastCommitDate(repoDir).format(DATE_TIME_FORMAT).unwrap()
 }
 
 
@@ -50,12 +55,12 @@ fn stageFile(filePath: &Path, repositoryDir: &Path)
                "Failed to stage file \"{:?}\", command finished with {}", filePath, status);
 }
 
-fn findLastCommitDate(repoDir: &Path) -> LocalDateTime
+fn findLastCommitDate(repoDir: &Path) -> OffsetDateTime
 {
     // --format=%cD means output contains only a commit date in RFC2822 format
     // see https://git-scm.com/docs/git-log#Documentation/git-log.txt-emcdem
     let output = getCommandStdoutString(&["git", "log", "-1", "--format=%cD"], repoDir).trim_end().to_owned();
-    chrono::DateTime::parse_from_rfc2822(&output).unwrap().into()
+    OffsetDateTime::parse(&output, &Rfc2822).unwrap()
 }
 
 fn getCommandStdoutString(commandParts: &[&str], repositoryDir: &Path) -> String

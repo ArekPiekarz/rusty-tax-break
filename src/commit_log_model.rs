@@ -11,7 +11,10 @@ use gtk::prelude::TreeModelExt as _;
 use std::cell::RefCell;
 use std::rc::Rc;
 use to_trait::To as _;
+use time::{format_description::FormatItem, macros::format_description};
 
+const DATE_TIME_FORMAT: &[FormatItem] =
+    format_description!("[day padding:space] [month repr:short] [year] [hour padding:space]:[minute]:[second]");
 const DO_NOT_REPORT_COMMIT: bool = false;
 
 
@@ -48,13 +51,12 @@ impl CommitLogModel
     fn onCommitLogChanged(&self)
     {
         self.store.clear();
-        // for date formatting below, see https://docs.rs/chrono/0.4.19/chrono/format/strftime/index.html
         for (row, commit) in self.commitLog.borrow().getCommits().iter().enumerate() {
             self.store.set(
                 &self.store.append(),
                 &[(CommitLogColumn::Report.into(),      &DO_NOT_REPORT_COMMIT),
                   (CommitLogColumn::Message.into(),     &commit.summary),
-                  (CommitLogColumn::Date.into(),        &commit.date.format("%_d %b %Y %_H:%M:%S").to_string()),
+                  (CommitLogColumn::Date.into(),        &commit.date.format(DATE_TIME_FORMAT).unwrap()),
                   (CommitLogColumn::Author.into(),      &commit.author),
                   (CommitLogColumn::Email.into(),       &commit.email),
                   (CommitLogColumn::OriginalRow.into(), &(row.try_to::<OriginalRow>().unwrap()))]);

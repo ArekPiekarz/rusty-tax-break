@@ -1,12 +1,11 @@
 use crate::commit_diff::{makeCommitSummary, makeFormattedDiff};
 use crate::commit_log::{CommitLog, CommitInfo};
-use crate::date_time::{LocalDateTime, ZERO_NANOSECONDS};
+use crate::date_time::makeDateTime;
 use crate::event::{Event, OutputPathInfo};
 use crate::event_handling::{EventHandler, onUnknown};
 use crate::repository::Repository;
 use crate::source::Source;
 
-use chrono::{Datelike as _, Timelike as _, TimeZone as _};
 use std::cell::RefCell;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -14,6 +13,7 @@ use std::io::Write as _;
 use std::path::Path;
 use std::path::PathBuf;
 use std::rc::Rc;
+use time::OffsetDateTime;
 use zip::write::FileOptions as ZipFileOptions;
 use zip::write::ZipWriter;
 
@@ -99,7 +99,7 @@ impl ReportGenerator
         let commitId = commitInfo.id;
         let commit = repo.findCommit(commitId).unwrap();
         let commitsDiff = repo.makeDiffOfCommitAndParent(&commit);
-        let commitDateTime = toZipDateTime(&chrono::Local.timestamp(commit.time().seconds(), ZERO_NANOSECONDS));
+        let commitDateTime = toZipDateTime(&makeDateTime(&commit.time()));
 
         let zipFileNameStem = self.formatFileName(commitInfo, repo);
         let fullFilesZipPath = makeFullFilesZipPath(outputPath, &zipFileNameStem);
@@ -194,14 +194,14 @@ fn reportFullFiles(
     }
 }
 
-fn toZipDateTime(dateTime: &LocalDateTime) -> zip::DateTime
+fn toZipDateTime(dateTime: &OffsetDateTime) -> zip::DateTime
 {
     zip::DateTime::from_date_and_time(
         dateTime.year().try_into().unwrap(),
-        dateTime.month().try_into().unwrap(),
-        dateTime.day().try_into().unwrap(),
-        dateTime.hour().try_into().unwrap(),
-        dateTime.minute().try_into().unwrap(),
-        dateTime.second().try_into().unwrap())
+        dateTime.month().into(),
+        dateTime.day(),
+        dateTime.hour(),
+        dateTime.minute(),
+        dateTime.second())
         .unwrap()
 }

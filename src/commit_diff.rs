@@ -1,7 +1,7 @@
-use crate::date_time::ZERO_NANOSECONDS;
+use crate::date_time::makeDateTime;
 use crate::diff_formatter::DiffFormatter;
 
-use chrono::TimeZone as _;
+use time::format_description::well_known::Rfc2822;
 
 
 pub fn makeCommitSummary(commit: &git2::Commit) -> String
@@ -11,7 +11,7 @@ pub fn makeCommitSummary(commit: &git2::Commit) -> String
         commit.id(),
         commit.author().name().unwrap(),
         commit.author().email().unwrap(),
-        chrono::Local.timestamp(commit.time().seconds(), ZERO_NANOSECONDS).to_rfc2822(),
+        formatDateTime(&commit.time()),
         tabulateCommitMessage(&getMessage(commit)))
 }
 
@@ -28,6 +28,11 @@ fn getMessage(commit: &git2::Commit) -> String
         Some(message) => message.into(),
         None => String::from_utf8_lossy(commit.message_bytes()).into()
     }
+}
+
+fn formatDateTime(inputTime: &git2::Time) -> String
+{
+    makeDateTime(inputTime).format(&Rfc2822).unwrap()
 }
 
 fn tabulateCommitMessage(message: &str) -> String

@@ -1,20 +1,19 @@
-use crate::date_time::LocalDate;
 use crate::event::Event;
 use crate::event_handling::Sender;
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
-use chrono::Datelike as _;
 use gtk::prelude::ComboBoxExt as _;
-use num_traits::cast::FromPrimitive as _;
+use time::{Date, Month};
+use to_trait::To as _;
 
 
-pub fn setupMonthFilterComboBox(date: &LocalDate, guiElementProvider: &GuiElementProvider, sender: Sender)
+pub fn setupMonthFilterComboBox(date: &Date, guiElementProvider: &GuiElementProvider, sender: Sender)
 {
     let monthFilterComboBox = guiElementProvider.get::<gtk::ComboBox>("monthFilterComboBox");
     monthFilterComboBox.connect_changed(move |widget| {
-        let month = chrono::Month::from_u32(widget.active_id().unwrap().as_str().parse().unwrap()).unwrap();
+        let month = Month::try_from(widget.active_id().unwrap().as_str().parse::<u8>().unwrap()).unwrap();
         sender.send((Source::MonthComboBox, Event::MonthFilterChanged(month))).unwrap();
     });
-    monthFilterComboBox.set_active_id(Some(&date.month().to_string()));
+    monthFilterComboBox.set_active_id(Some(&date.month().to::<u8>().to_string()));
 }
