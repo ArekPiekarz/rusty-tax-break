@@ -64,7 +64,7 @@ impl Repository
     pub fn makeDiffOfCommitAndParent(&self, commit: &git2::Commit) -> git2::Diff
     {
         let tree = commit.tree().unwrap();
-        let parentTreeOpt = findTreeOfParentOfCommit(&commit);
+        let parentTreeOpt = findTreeOfParentOfCommit(commit);
         let mut diffOptions = makeDiffOptions();
         self.repo.diff_tree_to_tree(parentTreeOpt.as_ref(), Some(&tree), Some(&mut diffOptions)).unwrap()
     }

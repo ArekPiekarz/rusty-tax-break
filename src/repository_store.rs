@@ -19,7 +19,7 @@ impl EventHandler for RepositoryStore
     fn handle(&mut self, source: Source, event: &Event)
     {
         match event {
-            Event::FolderChosen(path) => self.onFolderChosen(&path),
+            Event::FolderChosen(path) => self.onFolderChosen(path),
             _ => onUnknown(source, event)
         }
     }

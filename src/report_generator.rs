@@ -134,8 +134,7 @@ impl ReportGenerator
             fileName = fileName.replace("<commit_summary>", &commitInfo.summary);
         }
         let sanitizingOptions = sanitize_filename::Options{windows: true, truncate: true, replacement: "_"};
-        let fileName = sanitize_filename::sanitize_with_options(fileName, sanitizingOptions);
-        fileName
+        sanitize_filename::sanitize_with_options(fileName, sanitizingOptions)
     }
 }
 
@@ -165,7 +164,7 @@ fn reportDiffFile(
     zipOptions: &ZipFileOptions)
 {
     zipWriter.start_file(DIFF_FILE_PATH, *zipOptions).unwrap();
-    let textDiff = makeCommitSummary(&commit) + &makeFormattedDiff(&commitsDiff);
+    let textDiff = makeCommitSummary(commit) + &makeFormattedDiff(commitsDiff);
     zipWriter.write_all(textDiff.as_bytes()).unwrap();
 }
 
