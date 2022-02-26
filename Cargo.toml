@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 dirs = { version = "4.0.0", default-features = false }
-git2 = { version = "0.13.25", default-features = false }
+git2 = { version = "0.14.0", default-features = false }
 gtk = { version = "0.15.4", default-features = false, features = ["v3_20"] }
 sanitize-filename = {version = "0.3.0", default-features = false }
 serde = { version ="1.0.136", default-features = false, features = ["derive"] }
