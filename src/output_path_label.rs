@@ -1,4 +1,5 @@
 use crate::config_store::Config;
+use crate::date_time::MonthInt;
 use crate::event::{Event, OutputPathInfo};
 use crate::event_handling::{EventHandler, onUnknown};
 use crate::gui_element_provider::GuiElementProvider;
@@ -7,6 +8,7 @@ use crate::source::Source;
 use gtk::prelude::LabelExt as _;
 use std::path::Path;
 use time::Date;
+use to_trait::To;
 
 
 pub struct OutputPathLabel
@@ -35,7 +37,7 @@ impl OutputPathLabel
             Some(path) => path.to_string_lossy(),
             None => "<path>".into()
         };
-        widget.set_text(&format!("{}/{}/{:02}", prefixPath, date.year(), date.month()));
+        widget.set_text(&format!("{}/{}/{:02}", prefixPath, date.year(), date.month().to::<MonthInt>()));
         Self{widget}
     }
 

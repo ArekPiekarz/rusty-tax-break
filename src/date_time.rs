@@ -1,6 +1,8 @@
 use time::{Date, OffsetDateTime, UtcOffset};
 use tz::TimeZone;
 
+pub(crate) type MonthInt = u8;
+
 const SECONDS_IN_MINUTE: i32 = 60;
 
 

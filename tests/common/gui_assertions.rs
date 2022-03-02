@@ -6,6 +6,9 @@ use gtk::prelude::TreeModelExt as _;
 use gtk::prelude::TreeViewExt as _;
 use std::path::Path;
 use time::Date;
+use to_trait::To;
+
+type MonthInt = u8;
 
 const CONTINUE_ITERATING_MODEL: bool = false;
 
@@ -68,7 +71,7 @@ pub fn assertOutputPathLabelTextIsPlaceholder(date: &Date, gui: &TestGui)
 
 pub fn makeOutputPathLabelText(outputPathPrefix: &Path, date: &Date) -> String
 {
-    format!("{}/{}/{:02}", outputPathPrefix.to_string_lossy(), date.year(), date.month())
+    format!("{}/{}/{:02}", outputPathPrefix.to_string_lossy(), date.year(), date.month().to::<MonthInt>())
 }
 
 // private
@@ -144,5 +147,5 @@ impl From<CommitLogColumn> for i32
 
 fn makePlaceholderOutputPathLabelText(date: &Date) -> String
 {
-    format!("<path>/{}/{:02}", date.year(), date.month())
+    format!("<path>/{}/{:02}", date.year(), date.month().to::<MonthInt>())
 }

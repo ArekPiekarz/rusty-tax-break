@@ -1,4 +1,5 @@
 use crate::config_store::Config;
+use crate::date_time::MonthInt;
 use crate::event::{Event, OutputPathInfo, Year};
 use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::source::Source;
@@ -6,6 +7,7 @@ use crate::source::Source;
 use std::path::Path;
 use std::path::PathBuf;
 use time::{Date, Month};
+use to_trait::To;
 
 
 pub struct OutputPathStore
@@ -90,7 +92,7 @@ impl OutputPathStore
             Some(pathPrefix) => {
                 let mut path = pathPrefix.clone();
                 path.push(self.date.year().to_string());
-                path.push(format!("{:02}", self.date.month()));
+                path.push(self.formatMonth());
                 self.path = Some(path.clone());
                 self.sender.send(
                     (Source::OutputPathStore,
@@ -98,9 +100,14 @@ impl OutputPathStore
             },
             None => {
                 let mut path = PathBuf::from(self.date.year().to_string());
-                path.push(format!("{:02}", self.date.month()));
+                path.push(self.formatMonth());
                 self.sender.send((Source::OutputPathStore, Event::PartialOutputPathChanged(path))).unwrap();
             }
         }
+    }
+
+    fn formatMonth(&self) -> String
+    {
+        format!("{:02}", self.date.month().to::<MonthInt>())
     }
 }
