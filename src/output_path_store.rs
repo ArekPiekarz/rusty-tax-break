@@ -39,7 +39,7 @@ impl OutputPathStore
             Some(prefix) => {
                 let mut path = prefix.clone();
                 path.push(date.year().to_string());
-                path.push(format!("{:02}", date.month()));
+                path.push(format!("{:02}", date.month().to::<MonthInt>()));
                 Self{path: Some(path), pathPrefix: Some(prefix.into()), date, sender}
             },
             None => {
