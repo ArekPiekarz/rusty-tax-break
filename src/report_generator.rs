@@ -79,7 +79,7 @@ impl ReportGenerator
             None => return
         };
 
-        std::fs::create_dir_all(&outputPath).unwrap();
+        std::fs::create_dir_all(outputPath).unwrap();
 
         for commitInfo in self.commitLog.borrow().getCommits() {
             if !commitInfo.markedForReport {
@@ -103,7 +103,7 @@ impl ReportGenerator
 
         let zipFileNameStem = self.formatFileName(commitInfo, repo);
         let fullFilesZipPath = makeFullFilesZipPath(outputPath, &zipFileNameStem);
-        let fullFilesZipFile = OpenOptions::new().write(true).create_new(true).open(&fullFilesZipPath).unwrap();
+        let fullFilesZipFile = OpenOptions::new().write(true).create_new(true).open(fullFilesZipPath).unwrap();
         let mut fullFilesZipWriter = ZipWriter::new(fullFilesZipFile);
 
         let diffAndFullFilesZipPath = makeDiffAndFullFilesZipPath(outputPath, &zipFileNameStem);
