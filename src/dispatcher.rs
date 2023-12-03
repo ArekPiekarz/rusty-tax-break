@@ -67,7 +67,7 @@ pub fn setupDispatching(handlers: EventHandlers, receiver: Receiver)
         (S::YearSpinButton,                     E::YearFilterChanged(_))             => (&mut commitLogModelFilter, &mut outputPathStore).handle(source, &event),
         (source, event) => onUnknown(source, event) }
 
-        glib::Continue(true)
+        glib::ControlFlow::Continue
     });
 }
 

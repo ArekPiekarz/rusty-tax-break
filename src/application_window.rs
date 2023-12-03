@@ -1,9 +1,10 @@
 use crate::config_store::Config;
 use crate::event::Event;
-use crate::event_handling::{FORWARD_EVENT, Sender};
+use crate::event_handling::Sender;
 use crate::gui_element_provider::GuiElementProvider;
 use crate::source::Source;
 
+use gtk::glib;
 use gtk::prelude::GtkWindowExt as _;
 use gtk::prelude::WidgetExt as _;
 
@@ -45,6 +46,6 @@ fn connectToWindowDeletion(window: &gtk::ApplicationWindow)
         if gtk::main_level() > 0 {
             gtk::main_quit();
         }
-        FORWARD_EVENT
+        glib::Propagation::Proceed
     });
 }

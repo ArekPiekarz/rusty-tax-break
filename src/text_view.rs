@@ -1,5 +1,5 @@
 use crate::event::Event;
-use crate::event_handling::{CONSUME_EVENT, EventHandler, FORWARD_EVENT, onUnknown, Sender};
+use crate::event_handling::{EventHandler, onUnknown, Sender};
 use crate::gui_element_provider::GuiElementProvider;
 use crate::line_number::LineNumber;
 use crate::source::Source;
@@ -169,14 +169,14 @@ impl TextView
     }
 }
 
-fn onScrolled(event: &gdk::EventScroll, sender: &Sender, source: Source) -> gtk::Inhibit
+fn onScrolled(event: &gdk::EventScroll, sender: &Sender, source: Source) -> glib::Propagation
 {
     if !event.state().contains(gdk::ModifierType::CONTROL_MASK) {
-        return FORWARD_EVENT;
+        return glib::Propagation::Proceed;
     }
 
     sender.send((source, Event::ZoomRequested(event.clone()))).unwrap();
-    CONSUME_EVENT
+    glib::Propagation::Stop
 }
 
 struct Style

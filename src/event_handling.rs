@@ -3,8 +3,6 @@ use crate::source::Source;
 
 use gtk::glib;
 
-pub const CONSUME_EVENT: gtk::Inhibit = gtk::Inhibit(true);
-pub const FORWARD_EVENT: gtk::Inhibit = gtk::Inhibit(false);
 
 pub type Sender = glib::Sender<(Source, Event)>;
 pub type Receiver = glib::Receiver<(Source, Event)>;
