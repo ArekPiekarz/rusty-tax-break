@@ -9,10 +9,10 @@ dirs = { version = "5.0.1", default-features = false }
 git2 = { version = "0.18.1", default-features = false }
 gtk = { version = "0.18.1", default-features = false }
 sanitize-filename = {version = "0.5.0", default-features = false }
-serde = { version ="1.0.193", default-features = false, features = ["derive"] }
-time = { version = "0.3.30", default-features = false, features = ["formatting", "macros"] }
+serde = { version ="1.0.196", default-features = false, features = ["derive"] }
+time = { version = "0.3.32", default-features = false, features = ["formatting", "macros"] }
 to_trait = { version = "0.1.1", default-features = false }
-toml = { version = "0.8.8", default-features = false, features = ["display", "parse"] }
+toml = { version = "0.8.9", default-features = false, features = ["display", "parse"] }
 tz-rs = { version = "0.6.14", default-features = false, features = ["const", "std"] }
 zip = { version = "0.6.6", default-features = false, features = ["deflate"] }
 
@@ -20,9 +20,9 @@ zip = { version = "0.6.6", default-features = false, features = ["deflate"] }
 color-backtrace = { version = "0.6.1", default-features = false }
 gtk-test = {version = "0.18.0", default-features = false }
 rusty-fork = { version = "0.3.0", default-features = false }
-tempfile = { version = "3.8.1", default-features = false }
-termcolor = { version = "1.4.0", default-features = false }
-time = { version = "0.3.30", default-features = false, features = ["formatting", "macros", "parsing"] }
+tempfile = { version = "3.9.0", default-features = false }
+termcolor = { version = "1.4.1", default-features = false }
+time = { version = "0.3.32", default-features = false, features = ["formatting", "macros", "parsing"] }
 
 [profile.release]
 codegen-units = 1
